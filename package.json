@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "client": "webpack-dev-server --config ./config/webpack.config.dev.ts --open --mode development",
+    "client": "firebase serve --only hosting",
     "build": "webpack --config ./config/webpack.config.ts --mode production",
     "start": "set NODE_ENV=production && npm run build && npm run server",
     "test": "jest",
