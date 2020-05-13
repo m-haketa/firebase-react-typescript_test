@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "client": "firebase serve --only hosting",
-    "build": "webpack --config ./config/webpack.config.ts --mode production",
+    "build": "webpack --config ./config/webpack.config.ts",
     "start": "set NODE_ENV=production && npm run build && npm run server",
     "test": "jest",
     "tsnode": "ts-node -r tsconfig-paths/register",
