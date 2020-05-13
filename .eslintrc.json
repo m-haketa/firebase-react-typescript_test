@@ -1,0 +1,48 @@
+{
+  "env": {
+      "browser": true,
+      "es6": true,
+      "node": true
+  },
+  "extends": [
+      "plugin:@typescript-eslint/recommended",
+      "prettier/@typescript-eslint",
+      "prettier/react",
+      "plugin:prettier/recommended"
+  ],
+  "plugins": [
+      "@typescript-eslint",
+      "prefer-arrow",
+      "import",
+      "react",
+      "react-hooks"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "globals": {
+      "Atomics": "readonly",
+      "SharedArrayBuffer": "readonly"
+  },
+  "parserOptions": {
+      "sourceType": "module",
+      "createDefaultProgram" : true,
+      "project": "./tsconfig.json"
+  },
+  "rules": {
+      "@typescript-eslint/adjacent-overload-signatures": "error",
+      "@typescript-eslint/camelcase": "off",
+      "@typescript-eslint/no-namespace": "off",
+      "import/first": 2,
+      "react/jsx-uses-react": "error",
+      "react/jsx-uses-vars": "error",
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
+      "prettier/prettier": [
+          "error",
+          {
+              "singleQuote": true,
+              "semi": true,
+              "trailingComma": "es5"
+          }
+      ]
+  }
+}

@@ -1,0 +1,28 @@
+:global(.container) {
+  padding: 16px;
+}
+
+:global(.hourly_price_table td) {
+  white-space: nowrap;
+}
+
+:global(.hourly_price_table .num input) {
+  text-align: right;
+}
+
+:global(.hourly_price_table .noborderbottom) {
+  border-bottom: 0px;
+}
+
+:global(.amount) {
+  font-size: 3rem; 
+  width: 100%;
+  background: #fff;
+  text-align: center;
+}
+
+:global(.heading) {
+  margin-top: 32px;
+  margin-bottom: 16px;
+  font-size: 2rem;
+}
