@@ -13,6 +13,13 @@ export const firebaseConfig = {
   messagingSenderId: '1058197441056',
 };
 
+export const createRenderData = <T extends any>(
+  doc: firebase.firestore.DocumentChange<T>['doc']
+): T => {
+  const data = doc.data();
+  return data;
+};
+
 export const App: React.FC = () => {
   const [user, setUser] = useState<firebase.auth.UserCredential>();
 
@@ -31,30 +38,44 @@ export const App: React.FC = () => {
       });
   }, []);
 
-  /*
-  const [data, setData] = useState({} as any);
+  const [data, setData] = useState([] as any);
 
-  const app = firebase.app();
+  useEffect(() => {
+    const query = firebase
+      .firestore()
+      .collection(rootCollection)
+      .orderBy('avgRating', 'desc')
+      .limit(50);
 
-  const query = firebase
-    .firestore()
-    .collection(rootCollection)
-    .orderBy('avgRating', 'desc')
-    .limit(50);
+    query.onSnapshot((snapshot) => {
+      if (!snapshot.size) return null;
 
-  query.onSnapshot((snapshot) => {
-    if (!snapshot.size) return null;
-
-    snapshot.docChanges().forEach((change) => {
-      if (change.type === 'removed') {
-        console.log('removed');
-      } else {
-        setData(change.doc);
-      }
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === 'removed') {
+          setData((pd: any) => pd.filter((d: any) => d.id !== change.doc.id));
+        } else {
+          const d = createRenderData(change.doc);
+          setData((pd: any) => {
+            const newD = pd.filter((d: any) => d.id !== change.doc.id);
+            return [...newD, { ...d, id: change.doc.id }];
+          });
+        }
+      });
     });
-  });
+  }, [user]);
 
-  return <div>{data}</div>;
-  */
-  return <div>App: {user && user.user && user.user.uid}</div>;
+  return (
+    <>
+      <div>App: {user && user.user && user.user.uid}</div>
+      <div>
+        Data:
+        {data &&
+          data.map((d: any) => (
+            <div key={d.id}>
+              {d.id}、{d.name}、{d.numRatings}、{d.avgRating}
+            </div>
+          ))}
+      </div>
+    </>
+  );
 };
