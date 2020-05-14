@@ -31,23 +31,56 @@ export interface RestaurantsRatings {
   userName: string;
 }
 
-export type Get<T> = T & { id: string };
+export interface RestaurantsRatingsRet {
+  rating: number;
+  text: string;
+  timestamp: Date;
+  userId: string;
+  userName: string;
+}
 
 type Doc = firebase.firestore.DocumentChange['doc'];
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getData = <T extends { id: string }>(doc: Doc): T => {
-  const data = doc.data();
+export type Get<T> = T & { id: string };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return data as any;
+interface GetData {
+  <F, R>(doc: Doc, decode: (fsData: F) => R): Get<R>;
+  <F>(doc: Doc): Get<F>;
+}
+
+export const getData: GetData = <F, R = F>(
+  doc: Doc,
+  decode?: (fsData: F) => R
+): Get<R> | Get<F> => {
+  const data = doc.data() as F;
+
+  if (decode) {
+    return { id: doc.id, ...decode(data) };
+  } else {
+    return { id: doc.id, ...data };
+  }
 };
 
-const getRestaurantsData = (doc: Doc): Get<Restaurants> =>
-  getData<Get<Restaurants>>(doc);
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+const getRestaurantsData = (doc: Doc) => getData<Restaurants>(doc);
 
-const getRestaurantsRatingsData = (doc: Doc): Get<RestaurantsRatings> =>
-  getData<Get<RestaurantsRatings>>(doc);
+const decodeResturantsRatingsData = ({
+  timestamp,
+  ...others
+}: RestaurantsRatings): RestaurantsRatingsRet => {
+  const ret = {
+    ...others,
+    timestamp: new Date(timestamp),
+  };
+  return ret;
+};
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+const getRestaurantsRatingsData = (doc: Doc) =>
+  getData<RestaurantsRatings, RestaurantsRatingsRet>(
+    doc,
+    decodeResturantsRatingsData
+  );
 
 export const App: React.FC = () => {
   const [user, setUser] = useState<firebase.auth.UserCredential>();
@@ -83,10 +116,10 @@ export const App: React.FC = () => {
         if (change.type === 'removed') {
           setData((pd) => pd.filter((d) => d.id !== change.doc.id));
         } else {
-          const d = getRestaurantsData(change.doc);
+          const changeDoc = getRestaurantsData(change.doc);
           setData((pd) => {
-            const newD = pd.filter((d) => d.id !== change.doc.id);
-            return [...newD, { ...d, id: change.doc.id }];
+            const newD = pd.filter((d) => d.id !== changeDoc.id);
+            return [...newD, changeDoc];
           });
         }
       });
