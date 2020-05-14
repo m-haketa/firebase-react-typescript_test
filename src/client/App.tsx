@@ -1,17 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import * as firebase from 'firebase';
 
-const rootCollection = 'restaurants';
+import { useFireBase } from './useFirebaseInit';
 
-export const firebaseConfig = {
-  projectId: 'tutorial-277014',
-  databaseURL: 'https://tutorial-277014.firebaseio.com',
-  storageBucket: 'tutorial-277014.appspot.com',
-  locationId: 'asia-northeast1',
-  apiKey: 'AIzaSyDgUtOthKXWACyhm8BXM65NI40NqUgdeoc',
-  authDomain: 'tutorial-277014.firebaseapp.com',
-  messagingSenderId: '1058197441056',
-};
+const rootCollection = 'restaurants';
 
 export interface Restaurants {
   avgRating: number;
@@ -71,22 +63,7 @@ const getRestaurantsRatingsData = (doc: Doc) =>
   }));
 
 export const App: React.FC = () => {
-  const [user, setUser] = useState<firebase.auth.UserCredential>();
-
-  useEffect(() => {
-    console.log('setuser async');
-    firebase.initializeApp(firebaseConfig);
-
-    firebase
-      .auth()
-      .signInAnonymously()
-      .then((u) => {
-        setUser(u);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  }, []);
+  const user = useFireBase();
 
   const [data, setData] = useState<Get<Restaurants>[]>([]);
 
