@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import * as firebase from 'firebase';
+import React from 'react';
 
 import { useFireBase } from './useFirebaseInit';
+import { useFirebaseSnapshot } from './useFirebaseSnapshot';
 
 const rootCollection = 'restaurants';
 
-export interface Restaurants {
+export interface Restaurant {
   avgRating: number;
   category: string;
   city: string;
@@ -15,7 +15,7 @@ export interface Restaurants {
   price: number;
 }
 
-export interface RestaurantsRatings {
+export interface RestaurantRating {
   rating: number;
   text: string;
   timestamp: string;
@@ -23,7 +23,7 @@ export interface RestaurantsRatings {
   userName: string;
 }
 
-export interface RestaurantsRatingsRet {
+export interface RestaurantRatingRet {
   rating: number;
   text: string;
   timestamp: Date;
@@ -31,67 +31,12 @@ export interface RestaurantsRatingsRet {
   userName: string;
 }
 
-type Doc = firebase.firestore.DocumentChange['doc'];
-
-export type Get<T> = T & { id: string };
-
-interface GetData {
-  <F, R>(doc: Doc, decode: (fsData: F) => Partial<R>): Get<R>;
-  <F>(doc: Doc): Get<F>;
-}
-
-export const getData: GetData = <F, R = F>(
-  doc: Doc,
-  decode?: (fsData: F) => R
-): Get<R> | Get<F> => {
-  const data = doc.data() as F;
-
-  if (decode) {
-    return { id: doc.id, ...data, ...decode(data) };
-  } else {
-    return { id: doc.id, ...data };
-  }
-};
-
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-const getRestaurantsData = (doc: Doc) => getData<Restaurants>(doc);
-
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-const getRestaurantsRatingsData = (doc: Doc) =>
-  getData<RestaurantsRatings, RestaurantsRatingsRet>(doc, ({ timestamp }) => ({
-    timestamp: new Date(timestamp),
-  }));
-
 export const App: React.FC = () => {
   const user = useFireBase();
 
-  const [data, setData] = useState<Get<Restaurants>[]>([]);
-
-  useEffect(() => {
-    if (user === undefined) return;
-
-    const query = firebase
-      .firestore()
-      .collection(rootCollection)
-      .orderBy('avgRating', 'desc')
-      .limit(50);
-
-    query.onSnapshot((snapshot) => {
-      if (!snapshot.size) return null;
-
-      snapshot.docChanges().forEach((change) => {
-        if (change.type === 'removed') {
-          setData((pDocs) => pDocs.filter((pDoc) => pDoc.id !== change.doc.id));
-        } else {
-          const changeDoc = getRestaurantsData(change.doc);
-          setData((pDocs) => {
-            const newD = pDocs.filter((pDoc) => pDoc.id !== changeDoc.id);
-            return [...newD, changeDoc];
-          });
-        }
-      });
-    });
-  }, [user]);
+  const data = useFirebaseSnapshot<Restaurant>(user, rootCollection, (cRef) =>
+    cRef.orderBy('avgRating', 'desc').limit(50)
+  );
 
   return (
     <>
