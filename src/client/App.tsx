@@ -44,7 +44,7 @@ type Doc = firebase.firestore.DocumentChange['doc'];
 export type Get<T> = T & { id: string };
 
 interface GetData {
-  <F, R>(doc: Doc, decode: (fsData: F) => R): Get<R>;
+  <F, R>(doc: Doc, decode: (fsData: F) => Partial<R>): Get<R>;
   <F>(doc: Doc): Get<F>;
 }
 
@@ -55,7 +55,7 @@ export const getData: GetData = <F, R = F>(
   const data = doc.data() as F;
 
   if (decode) {
-    return { id: doc.id, ...decode(data) };
+    return { id: doc.id, ...data, ...decode(data) };
   } else {
     return { id: doc.id, ...data };
   }
@@ -64,23 +64,11 @@ export const getData: GetData = <F, R = F>(
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const getRestaurantsData = (doc: Doc) => getData<Restaurants>(doc);
 
-const decodeResturantsRatingsData = ({
-  timestamp,
-  ...others
-}: RestaurantsRatings): RestaurantsRatingsRet => {
-  const ret = {
-    ...others,
-    timestamp: new Date(timestamp),
-  };
-  return ret;
-};
-
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const getRestaurantsRatingsData = (doc: Doc) =>
-  getData<RestaurantsRatings, RestaurantsRatingsRet>(
-    doc,
-    decodeResturantsRatingsData
-  );
+  getData<RestaurantsRatings, RestaurantsRatingsRet>(doc, ({ timestamp }) => ({
+    timestamp: new Date(timestamp),
+  }));
 
 export const App: React.FC = () => {
   const [user, setUser] = useState<firebase.auth.UserCredential>();
@@ -114,11 +102,11 @@ export const App: React.FC = () => {
 
       snapshot.docChanges().forEach((change) => {
         if (change.type === 'removed') {
-          setData((pd) => pd.filter((d) => d.id !== change.doc.id));
+          setData((pDocs) => pDocs.filter((pDoc) => pDoc.id !== change.doc.id));
         } else {
           const changeDoc = getRestaurantsData(change.doc);
-          setData((pd) => {
-            const newD = pd.filter((d) => d.id !== changeDoc.id);
+          setData((pDocs) => {
+            const newD = pDocs.filter((pDoc) => pDoc.id !== changeDoc.id);
             return [...newD, changeDoc];
           });
         }
