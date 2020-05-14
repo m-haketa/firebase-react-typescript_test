@@ -34,7 +34,7 @@ export interface RestaurantRatingRet {
 export const App: React.FC = () => {
   const user = useFireBase();
 
-  const data = useFirebaseSnapshot<Restaurant>(user, rootCollection, (cRef) =>
+  const [data] = useFirebaseSnapshot<Restaurant>(user, rootCollection, (cRef) =>
     cRef.orderBy('avgRating', 'desc').limit(50)
   );
 

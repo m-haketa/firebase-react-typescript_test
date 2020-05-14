@@ -34,7 +34,7 @@ export const useFirebaseSnapshot = <D, U = D>(
     collectionReference: firebase.firestore.CollectionReference
   ) => firebase.firestore.Query,
   decode?: (fsData: D) => Partial<U>
-): Get<U>[] => {
+): [Get<U>[]] => {
   const [data, setData] = useState<Get<U>[]>([]);
 
   useEffect(() => {
@@ -69,5 +69,5 @@ export const useFirebaseSnapshot = <D, U = D>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  return data;
+  return [data];
 };
