@@ -44,7 +44,7 @@ export const useFirebaseSnapshot = <D, U = D>(
 
     const query = querySettings(documentData);
 
-    query.onSnapshot((snapshot) => {
+    const cancelSnapshot = query.onSnapshot((snapshot) => {
       if (!snapshot.size) return null;
 
       snapshot.docChanges().forEach((change) => {
@@ -59,6 +59,8 @@ export const useFirebaseSnapshot = <D, U = D>(
         }
       });
     });
+
+    return cancelSnapshot;
 
     //本来はcollection、querySettings、decodeも、2つ目の引数に入れるべきと警告が出る
     //だた、３つめのdecode callbackを無名関数で指定すると、snapshot更新のたびに、
