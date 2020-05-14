@@ -59,7 +59,15 @@ export const useFirebaseSnapshot = <D, U = D>(
         }
       });
     });
-  }, [user, collection, querySettings, decode]);
+
+    //本来はcollection、querySettings、decodeも、2つ目の引数に入れるべきと警告が出る
+    //だた、３つめのdecode callbackを無名関数で指定すると、snapshot更新のたびに、
+    //callback用関数オブジェクトも変わってしまい、さらにこのロジックでsnapshotが起動される
+    //、、、と無限に循環してしまう。そのため、user以外の変化時に実行しないように設定する
+    //callbackをグローバルで定義するか（たぶん）useCallbackしておけば、collection、
+    //querySettings、decodeを2つ目の引数に指定しても問題ない。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   return data;
 };
