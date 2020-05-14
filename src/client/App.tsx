@@ -91,6 +91,8 @@ export const App: React.FC = () => {
   const [data, setData] = useState<Get<Restaurants>[]>([]);
 
   useEffect(() => {
+    if (user === undefined) return;
+
     const query = firebase
       .firestore()
       .collection(rootCollection)
