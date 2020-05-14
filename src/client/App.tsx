@@ -13,12 +13,40 @@ export const firebaseConfig = {
   messagingSenderId: '1058197441056',
 };
 
-export const createRenderData = <T extends any>(
-  doc: firebase.firestore.DocumentChange<T>['doc']
-): T => {
+export interface Restaurants {
+  id: string;
+  avgRating: number;
+  category: string;
+  city: string;
+  name: string;
+  numRatings: number;
+  photo: string;
+  price: number;
+}
+
+export interface RestaurantsRatings {
+  id: string;
+  rating: number;
+  text: string;
+  timestamp: string;
+  userId: string;
+  userName: string;
+}
+
+type Doc = firebase.firestore.DocumentChange['doc'];
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getData = <T extends any>(doc: Doc): T => {
   const data = doc.data();
-  return data;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return data as any;
 };
+
+const getRestaurantsData = (doc: Doc): Restaurants => getData<Restaurants>(doc);
+
+const getRestaurantsRatingsData = (doc: Doc): RestaurantsRatings =>
+  getData<RestaurantsRatings>(doc);
 
 export const App: React.FC = () => {
   const [user, setUser] = useState<firebase.auth.UserCredential>();
@@ -38,7 +66,7 @@ export const App: React.FC = () => {
       });
   }, []);
 
-  const [data, setData] = useState([] as any);
+  const [data, setData] = useState<Restaurants[]>([]);
 
   useEffect(() => {
     const query = firebase
@@ -52,11 +80,11 @@ export const App: React.FC = () => {
 
       snapshot.docChanges().forEach((change) => {
         if (change.type === 'removed') {
-          setData((pd: any) => pd.filter((d: any) => d.id !== change.doc.id));
+          setData((pd) => pd.filter((d) => d.id !== change.doc.id));
         } else {
-          const d = createRenderData(change.doc);
-          setData((pd: any) => {
-            const newD = pd.filter((d: any) => d.id !== change.doc.id);
+          const d = getRestaurantsData(change.doc);
+          setData((pd) => {
+            const newD = pd.filter((d) => d.id !== change.doc.id);
             return [...newD, { ...d, id: change.doc.id }];
           });
         }
@@ -70,7 +98,7 @@ export const App: React.FC = () => {
       <div>
         Data:
         {data &&
-          data.map((d: any) => (
+          data.map((d) => (
             <div key={d.id}>
               {d.id}、{d.name}、{d.numRatings}、{d.avgRating}
             </div>
