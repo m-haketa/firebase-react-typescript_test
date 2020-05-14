@@ -14,7 +14,6 @@ export const firebaseConfig = {
 };
 
 export interface Restaurants {
-  id: string;
   avgRating: number;
   category: string;
   city: string;
@@ -25,7 +24,6 @@ export interface Restaurants {
 }
 
 export interface RestaurantsRatings {
-  id: string;
   rating: number;
   text: string;
   timestamp: string;
@@ -33,20 +31,23 @@ export interface RestaurantsRatings {
   userName: string;
 }
 
+export type Get<T> = T & { id: string };
+
 type Doc = firebase.firestore.DocumentChange['doc'];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getData = <T extends any>(doc: Doc): T => {
+export const getData = <T extends { id: string }>(doc: Doc): T => {
   const data = doc.data();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return data as any;
 };
 
-const getRestaurantsData = (doc: Doc): Restaurants => getData<Restaurants>(doc);
+const getRestaurantsData = (doc: Doc): Get<Restaurants> =>
+  getData<Get<Restaurants>>(doc);
 
-const getRestaurantsRatingsData = (doc: Doc): RestaurantsRatings =>
-  getData<RestaurantsRatings>(doc);
+const getRestaurantsRatingsData = (doc: Doc): Get<RestaurantsRatings> =>
+  getData<Get<RestaurantsRatings>>(doc);
 
 export const App: React.FC = () => {
   const [user, setUser] = useState<firebase.auth.UserCredential>();
@@ -66,7 +67,7 @@ export const App: React.FC = () => {
       });
   }, []);
 
-  const [data, setData] = useState<Restaurants[]>([]);
+  const [data, setData] = useState<Get<Restaurants>[]>([]);
 
   useEffect(() => {
     const query = firebase
