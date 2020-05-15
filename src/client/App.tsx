@@ -18,7 +18,7 @@ export const App: React.FC = () => {
             <Index user={user}></Index>
           </Route>
           <Route exact path="/restaurant/:restaurant_id">
-            <Restaurant></Restaurant>
+            <Restaurant user={user}></Restaurant>
           </Route>
         </Switch>
       </Router>
