@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import * as firebase from 'firebase';
 import firebaseConfig from './firebase_config.json';
 
-export const useFireBase = (): firebase.auth.UserCredential | undefined => {
-  const [user, setUser] = useState<firebase.auth.UserCredential>();
+export type UserCredential = firebase.auth.UserCredential;
+
+export const useFireBase = (): UserCredential | undefined => {
+  const [user, setUser] = useState<UserCredential>();
 
   useEffect(() => {
     console.log('setuser async');
