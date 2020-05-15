@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import * as firebase from 'firebase';
 
+import { Restaurant as RestaurantType } from './Index';
 import type { UserCredential } from '../useFirebaseInit';
 
 export interface RestaurantRating {
@@ -29,7 +30,8 @@ interface RestaurantProps {
 export const Restaurant: React.FC<RestaurantProps> = ({ user }) => {
   const { restaurant_id } = useParams();
 
-  const [restaurant, setRestaurant] = useState({});
+  const [restaurant, setRestaurant] = useState<RestaurantType | undefined>();
+  const [ratings, setRatings] = useState<RestaurantRating[]>([]);
 
   useEffect(() => {
     if (user === undefined) return;
@@ -39,8 +41,7 @@ export const Restaurant: React.FC<RestaurantProps> = ({ user }) => {
 
     firebase
       .firestore()
-      .collection(`restaurants`)
-      .doc(`${restaurant_id}`)
+      .doc(`restaurants/${restaurant_id}`)
       .get()
       .then((ret) => {
         if (ret === undefined) return;
@@ -49,12 +50,56 @@ export const Restaurant: React.FC<RestaurantProps> = ({ user }) => {
         console.log(`${data}`);
 
         if (data === undefined) return;
-        setRestaurant(data);
+        setRestaurant(data as any);
       })
       .catch((e) => {
         console.log(`error: ${e}`);
       });
   }, [user, restaurant_id, setRestaurant]);
 
-  return <div>restaurant_id:{restaurant_id}</div>;
+  useEffect(() => {
+    if (user === undefined) return;
+
+    console.log(`${restaurant_id}`);
+    if (restaurant_id === undefined) return;
+
+    firebase
+      .firestore()
+      .collection(`restaurants/${restaurant_id}/ratings`)
+      .get()
+      .then((ret) => {
+        if (ret === undefined) return;
+
+        const docs = ret.docs;
+
+        if (docs === undefined) return;
+        setRatings(docs.map((doc) => doc.data()) as any);
+      })
+      .catch((e) => {
+        console.log(`error: ${e}`);
+      });
+  }, [user, restaurant_id, setRatings]);
+
+  if (restaurant === undefined) return null;
+
+  return (
+    <div>
+      restaurant:
+      <br />
+      {restaurant.city},{restaurant.category},<img src={restaurant.photo} />
+      {ratings.length > 0 && (
+        <>
+          <br />
+          ratings:
+          <br />
+          {ratings.map((rating) => (
+            <>
+              {rating.userName},{rating.rating},{rating.text}
+              <br />
+            </>
+          ))}
+        </>
+      )}
+    </div>
+  );
 };
