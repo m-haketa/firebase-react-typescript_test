@@ -1,4 +1,5 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 
 export interface RestaurantRating {
   rating: number;
@@ -15,3 +16,12 @@ export interface RestaurantRatingRet {
   userId: string;
   userName: string;
 }
+
+interface RestaurantProps {
+  dummy?: string;
+}
+
+export const Restaurant: React.FC<RestaurantProps> = (props) => {
+  const { restaurant_id: restaurant_id_str } = useParams();
+  return <div>restaurant_id:{restaurant_id_str}</div>;
+};

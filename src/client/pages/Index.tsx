@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import { useFirebaseSnapshot } from '../useFirebaseSnapshot';
 
@@ -32,7 +33,8 @@ export const Index: React.FC<IndexProps> = ({ user }) => {
         {data &&
           data.map((d) => (
             <div key={d.id}>
-              {d.id}、{d.name}、{d.numRatings}、{d.avgRating}
+              <Link to={`/restaurant/${d.id}`}>{d.id}</Link>、{d.name}、
+              {d.numRatings}、{d.avgRating}
             </div>
           ))}
       </div>
