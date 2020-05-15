@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 
 import { App } from '@client/App';
 
-const Index: React.FC = () => {
+const Root: React.FC = () => {
   return <App />;
 };
 
-ReactDOM.render(<Index />, document.getElementById('index'));
+ReactDOM.render(<Root />, document.getElementById('index'));
