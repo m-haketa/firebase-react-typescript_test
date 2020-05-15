@@ -14,6 +14,7 @@ const config: webpack.Configuration = {
   output: {
     path: path.resolve('dist'),
     filename: '[name].js',
+    publicPath: '/',
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],
