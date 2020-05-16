@@ -34,3 +34,5 @@ export type KeyOfPrimitiveValue<T> = {
 export type DocumentProps<T> = Pick<T, KeyOfPrimitiveValue<T>>;
 
 export type CollectionProps<T> = Omit<T, KeyOfPrimitiveValue<T>>;
+
+export type WithId<T> = T & { _id: string };

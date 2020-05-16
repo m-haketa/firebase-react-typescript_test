@@ -1,8 +1,8 @@
 import * as firebase from 'firebase';
 
-import { DocumentProps } from './type';
+import type { DocumentProps, WithId } from './type';
 
-export class Query<D, U = D> {
+export class Query<D, U> {
   constructor(private qImpl: firebase.firestore.Query) {}
 
   get(
@@ -10,6 +10,16 @@ export class Query<D, U = D> {
   ): Promise<firebase.firestore.QuerySnapshot<DocumentProps<D>>> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.qImpl.get(options) as any;
+  }
+
+  fetch(
+    options?: firebase.firestore.GetOptions
+  ): Promise<WithId<DocumentProps<D>>[]> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return this.qImpl.get(options).then((get) => {
+      if (get.docs === undefined) return [];
+      return get.docs.map((doc) => ({ _id: doc.id, ...doc.data() })) as any;
+    });
   }
 
   /* query

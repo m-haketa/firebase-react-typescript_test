@@ -67,16 +67,10 @@ export const Restaurant: React.FC<RestaurantProps> = ({ user }) => {
       .collection(`restaurants`)
       .doc(restaurant_id)
       .collection(`ratings`)
-      .get()
+      .fetch()
       .then((ret) => {
-        if (ret === undefined) return;
-
-        const docs = ret.docs;
-
-        if (docs === undefined) return;
         setRatings(
-          docs.map((doc) => {
-            const data = doc.data();
+          ret.map((data) => {
             return { ...data, timestamp: data.timestamp.toDate().toString() };
           })
         );
