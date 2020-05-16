@@ -36,8 +36,5 @@ export class CollectionReference<D, U> extends Query<D, U> {
   readonly path: string;
   add(data: T): Promise<DocumentReference<T>>;
   isEqual(other: CollectionReference<T>): boolean;
-  withConverter<U>(
-    converter: FirestoreDataConverter<U>
-  ): CollectionReference<U>;
   */
 }
