@@ -11,6 +11,7 @@ export class WebFirestoreTestUtil {
   projectId: string;
   uid: string;
   app: ReturnType<typeof firebase.initializeTestApp>;
+  settings: firebase.firestore.Settings;
   webFirestore: firebase.firestore.Firestore;
 
   constructor() {
@@ -24,8 +25,14 @@ export class WebFirestoreTestUtil {
       auth: { uid: this.uid },
     });
 
+    this.settings = {
+      host: 'localhost:8000',
+      ssl: false,
+    };
+
     // Setup web Firestore and admin Firestore with using emulator
     this.webFirestore = this.app.firestore();
+    this.webFirestore.settings(this.settings);
   }
 
   // Clear emulator Firestore data

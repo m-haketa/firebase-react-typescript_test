@@ -10,7 +10,8 @@
     "test": "jest",
     "tsnode": "ts-node -r tsconfig-paths/register",
     "firebase": "firebase",
-    "firebaseserve": "firebase serve --only hosting"
+    "hosting": "firebase serve --only hosting",
+    "emulator": "firebase emulators:start"
   },
   "author": "",
   "license": "ISC",
