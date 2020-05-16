@@ -94,32 +94,38 @@ export class Query<D, U> {
     return this.qImpl.isEqual(other.qImpl);
   }
 
-  /* query
-  readonly firestore: Firestore;
   onSnapshot(observer: {
-    next?: (snapshot: QuerySnapshot<T>) => void;
+    next?: (snapshot: firebase.firestore.QuerySnapshot<D>) => void;
     error?: (error: Error) => void;
     complete?: () => void;
   }): () => void;
   onSnapshot(
-    options: SnapshotListenOptions,
+    options: firebase.firestore.SnapshotListenOptions,
     observer: {
-      next?: (snapshot: QuerySnapshot<T>) => void;
+      next?: (snapshot: firebase.firestore.QuerySnapshot<D>) => void;
       error?: (error: Error) => void;
       complete?: () => void;
     }
   ): () => void;
   onSnapshot(
-    onNext: (snapshot: QuerySnapshot<T>) => void,
+    onNext: (snapshot: firebase.firestore.QuerySnapshot<D>) => void,
     onError?: (error: Error) => void,
     onCompletion?: () => void
   ): () => void;
   onSnapshot(
-    options: SnapshotListenOptions,
-    onNext: (snapshot: QuerySnapshot<T>) => void,
+    options: firebase.firestore.SnapshotListenOptions,
+    onNext: (snapshot: firebase.firestore.QuerySnapshot<D>) => void,
     onError?: (error: Error) => void,
     onCompletion?: () => void
   ): () => void;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onSnapshot(param1: any, ...params: any[]): () => void {
+    return this.qImpl.onSnapshot(param1, ...params);
+  }
+
+  /* query
+  readonly firestore: Firestore;
   withConverter<U>(converter: FirestoreDataConverter<U>): Query<U>;
   */
 }
