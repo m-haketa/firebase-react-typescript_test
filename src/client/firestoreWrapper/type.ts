@@ -36,3 +36,14 @@ export type DocumentProps<T> = Pick<T, KeyOfPrimitiveValue<T>>;
 export type CollectionProps<T> = Omit<T, KeyOfPrimitiveValue<T>>;
 
 export type WithId<T> = T & { _id: string };
+
+//T、Sがオブジェクトのとき、Sに含まれるの指定のpropertyの方を入れ替える
+export type Substitute<T, S> = Omit<T, keyof S> & S;
+
+export interface Decoder<DatabaseSchema, UserSchema> {
+  (dbData: DatabaseSchema): Partial<Substitute<DatabaseSchema, UserSchema>>;
+}
+
+export interface Encoder<DatabaseSchema, UserSchema> {
+  (userData: Substitute<DatabaseSchema, UserSchema>): Partial<DatabaseSchema>;
+}

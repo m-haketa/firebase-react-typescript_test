@@ -3,7 +3,11 @@ import * as firebase from 'firebase';
 import type { DocumentProps, WithId } from './type';
 
 export class Query<D, U> {
-  constructor(private qImpl: firebase.firestore.Query) {}
+  constructor(
+    private qImpl: firebase.firestore.Query,
+    protected decoder?: (dbData: D) => Partial<U>,
+    protected encoder?: (userData: U) => Partial<D>
+  ) {}
 
   get(
     options?: firebase.firestore.GetOptions
@@ -14,11 +18,16 @@ export class Query<D, U> {
 
   fetch(
     options?: firebase.firestore.GetOptions
-  ): Promise<WithId<DocumentProps<D>>[]> {
+  ): Promise<WithId<DocumentProps<U>>[]> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.qImpl.get(options).then((get) => {
       if (get.docs === undefined) return [];
-      return get.docs.map((doc) => ({ _id: doc.id, ...doc.data() })) as any;
+      return get.docs.map((doc) => {
+        const data = doc.data();
+        const decoded = this.decoder ? this.decoder(data as D) : data;
+        return { _id: doc.id, ...data, ...decoded };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      }) as any;
     });
   }
 
