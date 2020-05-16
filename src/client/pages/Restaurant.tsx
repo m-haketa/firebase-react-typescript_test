@@ -57,13 +57,8 @@ export const Restaurant: React.FC<RestaurantProps> = ({ user }) => {
     firestore<Database>()
       .collection('restaurants')
       .doc(restaurant_id)
-      .get()
-      .then((ret) => {
-        if (ret === undefined) return;
-
-        const data = ret.data();
-        console.log(`${data}`);
-
+      .fetch()
+      .then((data) => {
         if (data === undefined) return;
         setRestaurant(data);
       })
