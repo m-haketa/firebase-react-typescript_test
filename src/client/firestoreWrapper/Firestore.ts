@@ -2,7 +2,7 @@ import * as firebase from 'firebase';
 
 import { CollectionReference } from './CollectionReference';
 
-class Firestore<D, U = D> {
+class Firestore<D> {
   private impl: firebase.firestore.Firestore;
 
   constructor(app?: firebase.app.App) {
@@ -10,11 +10,11 @@ class Firestore<D, U = D> {
   }
 
   collection(
-    collectionPath: string & keyof D & keyof U
-  ): CollectionReference<D[typeof collectionPath], U[typeof collectionPath]> {
+    collectionPath: string & keyof D
+  ): CollectionReference<D[typeof collectionPath], D[typeof collectionPath]> {
     return new CollectionReference<
       D[typeof collectionPath],
-      U[typeof collectionPath]
+      D[typeof collectionPath]
     >(this.impl.collection(collectionPath));
   }
 
@@ -43,8 +43,6 @@ class Firestore<D, U = D> {
   */
 }
 
-export const firestore = <D, U = D>(
-  app?: firebase.app.App
-): Firestore<D, U> => {
-  return new Firestore<D, U>(app);
+export const firestore = <D>(app?: firebase.app.App): Firestore<D> => {
+  return new Firestore<D>(app);
 };
