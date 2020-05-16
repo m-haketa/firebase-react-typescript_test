@@ -1,16 +1,34 @@
 import * as firebase from 'firebase';
 
 import { CollectionReference } from './CollectionReference';
-import { DocumentProps, CollectionProps } from './type';
+import { DocumentProps, CollectionProps, WithId } from './type';
 
 export class DocumentReference<D, U> {
-  constructor(private dImpl: firebase.firestore.DocumentReference) {}
+  constructor(
+    private dImpl: firebase.firestore.DocumentReference,
+    private decoder?: (dbData: D) => Partial<U>,
+    private encoder?: (userData: U) => Partial<D>
+  ) {}
 
   get(
     options?: firebase.firestore.GetOptions
   ): Promise<firebase.firestore.DocumentSnapshot<DocumentProps<D>>> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.dImpl.get(options) as any;
+  }
+
+  fetch(
+    options?: firebase.firestore.GetOptions
+  ): Promise<WithId<DocumentProps<U>> | undefined> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return this.dImpl.get(options).then((doc) => {
+      const data = doc.data();
+      if (data === undefined) return undefined;
+
+      const decoded = this.decoder ? this.decoder(data as D) : data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return { _id: doc.id, ...data, ...decoded } as any;
+    });
   }
 
   collection(
