@@ -80,11 +80,7 @@ export const Restaurant: React.FC<RestaurantProps> = ({ user }) => {
       .withConverter<{ timestamp: string }>(decoder, encoder)
       .fetch()
       .then((ret) => {
-        setRatings(
-          ret.map((data) => {
-            return data;
-          })
-        );
+        setRatings(ret);
       })
       .catch((e) => {
         console.log(`error: ${e}`);
