@@ -11,8 +11,10 @@ import type {
 export class Query<D, U> {
   constructor(
     private qImpl: firebase.firestore.Query,
-    protected decoder?: (dbData: D) => Partial<U>,
-    protected encoder?: (userData: U) => Partial<D>
+    protected decoder?: (dbData: DocumentProps<D>) => Partial<DocumentProps<U>>,
+    protected encoder?: (
+      userData: DocumentProps<U>
+    ) => Partial<DocumentProps<D>>
   ) {}
 
   get firestore(): firebase.firestore.Firestore {
@@ -165,9 +167,13 @@ export class Query<D, U> {
 
   //Vは、Dのうち置換したい項目だけ書けばOK
   withConverter<V extends object>(
-    decoder: Decoder<D, V>,
-    encoder: Encoder<D, V>
+    decoder: Decoder<DocumentProps<D>, V>,
+    encoder: Encoder<DocumentProps<D>, V>
   ): Query<D, Substitute<D, V>> {
-    return new Query<D, Substitute<D, V>>(this.qImpl, decoder, encoder);
+    return new Query<D, Substitute<D, V>>(
+      this.qImpl,
+      decoder as any,
+      encoder as any
+    );
   }
 }

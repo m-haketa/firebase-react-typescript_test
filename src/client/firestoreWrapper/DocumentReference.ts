@@ -6,8 +6,8 @@ import { DocumentProps, CollectionProps, WithId } from './type';
 export class DocumentReference<D, U> {
   constructor(
     private dImpl: firebase.firestore.DocumentReference,
-    private decoder?: (dbData: D) => Partial<U>,
-    private encoder?: (userData: U) => Partial<D>
+    private decoder?: (dbData: DocumentProps<D>) => Partial<DocumentProps<U>>,
+    private encoder?: (userData: DocumentProps<U>) => Partial<DocumentProps<D>>
   ) {}
 
   get firestore(): firebase.firestore.Firestore {
