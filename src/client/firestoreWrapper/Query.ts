@@ -31,28 +31,71 @@ export class Query<D, U> {
     });
   }
 
+  where(
+    fieldPath: string | firebase.firestore.FieldPath,
+    opStr: firebase.firestore.WhereFilterOp,
+    value: unknown
+  ): Query<D, U> {
+    return new Query<D, U>(this.qImpl.where(fieldPath, opStr, value));
+  }
+
+  orderBy(
+    fieldPath: string | firebase.firestore.FieldPath,
+    directionStr?: firebase.firestore.OrderByDirection
+  ): Query<D, U> {
+    return new Query<D, U>(this.qImpl.orderBy(fieldPath, directionStr));
+  }
+
+  limit(limit: number): Query<D, U> {
+    return new Query<D, U>(this.qImpl.limit(limit));
+  }
+
+  limitToLast(limit: number): Query<D, U> {
+    return new Query<D, U>(this.qImpl.limitToLast(limit));
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  startAt(snapshot: firebase.firestore.DocumentSnapshot<any>): Query<D, U>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  startAt(...fieldValues: any[]): Query<D, U>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  startAt(...params: any[]): Query<D, U> {
+    return new Query<D, U>(this.qImpl.startAt(...params));
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  startAfter(snapshot: firebase.firestore.DocumentSnapshot<any>): Query<D, U>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  startAfter(...fieldValues: any[]): Query<D, U>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  startAfter(...params: any[]): Query<D, U> {
+    return new Query<D, U>(this.qImpl.startAfter(...params));
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  endBefore(snapshot: firebase.firestore.DocumentSnapshot<any>): Query<D, U>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  endBefore(...fieldValues: any[]): Query<D, U>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  endBefore(...params: any[]): Query<D, U> {
+    return new Query<D, U>(this.qImpl.endBefore(...params));
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  endAt(snapshot: firebase.firestore.DocumentSnapshot<any>): Query<D, U>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  endAt(...fieldValues: any[]): Query<D, U>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  endAt(...params: any[]): Query<D, U> {
+    return new Query<D, U>(this.qImpl.endAt(...params));
+  }
+
+  isEqual(other: Query<D, U>): boolean {
+    return this.qImpl.isEqual(other.qImpl);
+  }
+
   /* query
   readonly firestore: Firestore;
-  where(
-    fieldPath: string | FieldPath,
-    opStr: WhereFilterOp,
-    value: any
-  ): Query<T>;
-  orderBy(
-    fieldPath: string | FieldPath,
-    directionStr?: OrderByDirection
-  ): Query<T>;
-  limit(limit: number): Query<T>;
-  limitToLast(limit: number): Query<T>;
-  startAt(snapshot: DocumentSnapshot<any>): Query<T>;
-  startAt(...fieldValues: any[]): Query<T>;
-  startAfter(snapshot: DocumentSnapshot<any>): Query<T>;
-  startAfter(...fieldValues: any[]): Query<T>;
-  endBefore(snapshot: DocumentSnapshot<any>): Query<T>;
-  endBefore(...fieldValues: any[]): Query<T>;
-  endAt(snapshot: DocumentSnapshot<any>): Query<T>;
-  endAt(...fieldValues: any[]): Query<T>;
-  isEqual(other: Query<T>): boolean;
   onSnapshot(observer: {
     next?: (snapshot: QuerySnapshot<T>) => void;
     error?: (error: Error) => void;
