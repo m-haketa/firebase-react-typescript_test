@@ -43,6 +43,9 @@ class Firestore<D> {
   */
 }
 
-export const firestore = <D>(app?: firebase.app.App): Firestore<D> => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const firestore = <D = { [key: string]: any }>(
+  app?: firebase.app.App
+): Firestore<D> => {
   return new Firestore<D>(app);
 };
