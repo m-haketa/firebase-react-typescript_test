@@ -3,7 +3,7 @@ import * as firebase from 'firebase';
 import { CollectionReference } from './CollectionReference';
 import { DocumentProps, CollectionProps } from './type';
 
-export class DocumentReference<D, U = D> {
+export class DocumentReference<D, U> {
   constructor(private dImpl: firebase.firestore.DocumentReference) {}
 
   get(
