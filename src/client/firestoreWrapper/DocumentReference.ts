@@ -10,6 +10,22 @@ export class DocumentReference<D, U> {
     private encoder?: (userData: U) => Partial<D>
   ) {}
 
+  get firestore(): firebase.firestore.Firestore {
+    return this.dImpl.firestore;
+  }
+
+  get id(): string {
+    return this.dImpl.id;
+  }
+
+  get path(): string {
+    return this.dImpl.path;
+  }
+
+  isEqual(other: DocumentReference<D, U>): boolean {
+    return this.dImpl.isEqual(other.dImpl);
+  }
+
   get(
     options?: firebase.firestore.GetOptions
   ): Promise<firebase.firestore.DocumentSnapshot<DocumentProps<D>>> {
@@ -41,11 +57,7 @@ export class DocumentReference<D, U> {
   }
 
   /*
-  readonly id: string;
-  readonly firestore: Firestore;
   readonly parent: CollectionReference<T>;
-  readonly path: string;
-  isEqual(other: DocumentReference<T>): boolean;
   set(data: T, options?: SetOptions): Promise<void>;
   update(data: UpdateData): Promise<void>;
   update(
@@ -54,7 +66,6 @@ export class DocumentReference<D, U> {
     ...moreFieldsAndValues: any[]
   ): Promise<void>;
   delete(): Promise<void>;
-  get(options?: GetOptions): Promise<DocumentSnapshot<T>>;
   onSnapshot(observer: {
     next?: (snapshot: DocumentSnapshot<T>) => void;
     error?: (error: FirestoreError) => void;

@@ -14,6 +14,18 @@ export class CollectionReference<D, U> extends Query<D, U> {
     super(cImpl, decoder, encoder);
   }
 
+  get id(): string {
+    return this.cImpl.id;
+  }
+
+  get path(): string {
+    return this.cImpl.path;
+  }
+
+  isEqual(other: CollectionReference<D, U>): boolean {
+    return this.cImpl.isEqual(other.cImpl);
+  }
+
   doc(documentPath?: string): DocumentReference<D, U> {
     return new DocumentReference<D, U>(this.cImpl.doc(documentPath));
   }
@@ -31,10 +43,7 @@ export class CollectionReference<D, U> extends Query<D, U> {
   }
 
   /*
-  readonly id: string;
   readonly parent: DocumentReference<DocumentData> | null;
-  readonly path: string;
   add(data: T): Promise<DocumentReference<T>>;
-  isEqual(other: CollectionReference<T>): boolean;
   */
 }
