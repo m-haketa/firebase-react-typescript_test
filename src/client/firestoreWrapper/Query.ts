@@ -130,6 +130,35 @@ export class Query<D, U> {
     return this.qImpl.onSnapshot(param1, ...params);
   }
 
+  fetchSnapshot(callback: (arrData: WithId<DocumentProps<U>>[]) => void): void {
+    let retArr: WithId<DocumentProps<U>>[] = [];
+
+    this.onSnapshot((snapshot) => {
+      if (!snapshot.size) {
+        retArr = [];
+      } else {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === 'removed') {
+            retArr = retArr.filter((data) => data._id !== change.doc.id);
+          } else {
+            const changeDoc = change.doc;
+            const changeDocData = changeDoc.data();
+            const decoded = this.decoder ? this.decoder(changeDocData) : {};
+
+            retArr = retArr.filter((data) => data._id !== change.doc.id);
+            retArr.push({
+              _id: changeDoc.id,
+              ...changeDocData,
+              ...decoded,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } as any);
+          }
+        });
+      }
+      callback(retArr);
+    });
+  }
+
   //Vは、Dのうち置換したい項目だけ書けばOK
   withConverter<V extends object>(
     decoder: Decoder<D, V>,
