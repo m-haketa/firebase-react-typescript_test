@@ -10,6 +10,8 @@ import type { UserCredential } from '../useFirebaseInit';
 import { firestore } from '../firestoreWrapper/Firestore';
 import { Database } from '../schema';
 
+import type { Decoder, Encoder, Timestamp } from '../firestoreWrapper/type';
+
 export interface RestaurantRating {
   rating: number;
   text: string;
@@ -29,6 +31,19 @@ export interface RestaurantRatingRet {
 interface RestaurantProps {
   user: UserCredential | undefined;
 }
+
+const decoder: Decoder<{ timestamp: Timestamp }, { timestamp: string }> = ({
+  timestamp,
+}) => ({ timestamp: timestamp.toDate().toString() });
+
+const encoder: Encoder<{ timestamp: Timestamp }, { timestamp: string }> = ({
+  timestamp,
+}) => ({
+  timestamp: new firebase.firestore.Timestamp(
+    new Date(timestamp).getTime() / 1000,
+    0
+  ),
+});
 
 export const Restaurant: React.FC<RestaurantProps> = ({ user }) => {
   const { restaurant_id } = useParams();
@@ -67,11 +82,12 @@ export const Restaurant: React.FC<RestaurantProps> = ({ user }) => {
       .collection(`restaurants`)
       .doc(restaurant_id)
       .collection(`ratings`)
+      .withConverter<{ timestamp: string }>(decoder, encoder)
       .fetch()
       .then((ret) => {
         setRatings(
           ret.map((data) => {
-            return { ...data, timestamp: data.timestamp.toDate().toString() };
+            return data;
           })
         );
       })
