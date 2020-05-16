@@ -7,6 +7,9 @@ import * as firebase from 'firebase';
 import { Restaurant as RestaurantType } from './Index';
 import type { UserCredential } from '../useFirebaseInit';
 
+import { firestore } from '../firestoreWrapper/Firestore';
+import { Database } from '../schema';
+
 export interface RestaurantRating {
   rating: number;
   text: string;
@@ -36,12 +39,9 @@ export const Restaurant: React.FC<RestaurantProps> = ({ user }) => {
   useEffect(() => {
     if (user === undefined) return;
 
-    console.log(`${restaurant_id}`);
-    if (restaurant_id === undefined) return;
-
-    firebase
-      .firestore()
-      .doc(`restaurants/${restaurant_id}`)
+    firestore<Database>()
+      .collection('restaurants')
+      .doc(restaurant_id)
       .get()
       .then((ret) => {
         if (ret === undefined) return;
@@ -50,7 +50,7 @@ export const Restaurant: React.FC<RestaurantProps> = ({ user }) => {
         console.log(`${data}`);
 
         if (data === undefined) return;
-        setRestaurant(data as any);
+        setRestaurant(data);
       })
       .catch((e) => {
         console.log(`error: ${e}`);
@@ -63,9 +63,10 @@ export const Restaurant: React.FC<RestaurantProps> = ({ user }) => {
     console.log(`${restaurant_id}`);
     if (restaurant_id === undefined) return;
 
-    firebase
-      .firestore()
-      .collection(`restaurants/${restaurant_id}/ratings`)
+    firestore<Database>()
+      .collection(`restaurants`)
+      .doc(restaurant_id)
+      .collection(`ratings`)
       .get()
       .then((ret) => {
         if (ret === undefined) return;
@@ -73,7 +74,12 @@ export const Restaurant: React.FC<RestaurantProps> = ({ user }) => {
         const docs = ret.docs;
 
         if (docs === undefined) return;
-        setRatings(docs.map((doc) => doc.data()) as any);
+        setRatings(
+          docs.map((doc) => {
+            const data = doc.data();
+            return { ...data, timestamp: data.timestamp.toDate().toString() };
+          })
+        );
       })
       .catch((e) => {
         console.log(`error: ${e}`);
@@ -94,7 +100,7 @@ export const Restaurant: React.FC<RestaurantProps> = ({ user }) => {
           <br />
           {ratings.map((rating) => (
             <>
-              {rating.userName},{rating.rating},{rating.text}
+              {rating.userName},{rating.rating},{rating.text},{rating.timestamp}
               <br />
             </>
           ))}
