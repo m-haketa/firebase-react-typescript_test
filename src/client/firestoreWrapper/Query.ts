@@ -15,6 +15,10 @@ export class Query<D, U> {
     protected encoder?: (userData: U) => Partial<D>
   ) {}
 
+  get firestore(): firebase.firestore.Firestore {
+    return this.qImpl.firestore;
+  }
+
   get(
     options?: firebase.firestore.GetOptions
   ): Promise<firebase.firestore.QuerySnapshot<DocumentProps<D>>> {
@@ -166,8 +170,4 @@ export class Query<D, U> {
   ): Query<D, Substitute<D, V>> {
     return new Query<D, Substitute<D, V>>(this.qImpl, decoder, encoder);
   }
-
-  /* query
-  readonly firestore: Firestore;
-  */
 }
