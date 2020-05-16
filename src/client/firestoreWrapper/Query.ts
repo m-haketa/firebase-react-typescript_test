@@ -1,6 +1,12 @@
 import * as firebase from 'firebase';
 
-import type { DocumentProps, WithId } from './type';
+import type {
+  DocumentProps,
+  WithId,
+  Substitute,
+  Decoder,
+  Encoder,
+} from './type';
 
 export class Query<D, U> {
   constructor(
@@ -124,8 +130,15 @@ export class Query<D, U> {
     return this.qImpl.onSnapshot(param1, ...params);
   }
 
+  //Vは、Dのうち置換したい項目だけ書けばOK
+  withConverter<V extends object>(
+    decoder: Decoder<D, V>,
+    encoder: Encoder<D, V>
+  ): Query<D, Substitute<D, V>> {
+    return new Query<D, Substitute<D, V>>(this.qImpl, decoder, encoder);
+  }
+
   /* query
   readonly firestore: Firestore;
-  withConverter<U>(converter: FirestoreDataConverter<U>): Query<U>;
   */
 }
