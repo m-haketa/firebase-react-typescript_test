@@ -39,6 +39,7 @@
     "firebase-tools": "^8.2.0",
     "html-webpack-plugin": "^4.3.0",
     "jest": "^26.0.1",
+    "jest-environment-uint8array": "^1.0.0",
     "prettier": "^2.0.5",
     "style-loader": "^1.2.1",
     "ts-jest": "^25.5.0",
@@ -82,6 +83,7 @@
     "moduleNameMapper": {
       "^@client/(.*)$": "<rootDir>/src/client/$1",
       "^@server/(.*)$": "<rootDir>/src/server/$1"
-    }
+    },
+    "testEnvironment": "jest-environment-uint8array"
   }
 }
