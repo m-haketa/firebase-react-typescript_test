@@ -2,15 +2,12 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 
 import { useEffect, useState } from 'react';
-import * as firebase from 'firebase';
 
 import { Restaurant as RestaurantType } from './Index';
 import type { UserCredential } from '../useFirebaseInit';
 
 import { firestore } from '../firestoreWrapper/Firestore';
-import { Database } from '../schema';
-
-import type { Decoder, Encoder, Timestamp } from '../firestoreWrapper/type';
+import { Database, timestampDecoder, timestampEncoder } from '../schema';
 
 export interface RestaurantRating {
   rating: number;
@@ -31,19 +28,6 @@ export interface RestaurantRatingRet {
 interface RestaurantProps {
   user: UserCredential | undefined;
 }
-
-const decoder: Decoder<{ timestamp: Timestamp }, { timestamp: string }> = ({
-  timestamp,
-}) => ({ timestamp: timestamp.toDate().toString() });
-
-const encoder: Encoder<{ timestamp: Timestamp }, { timestamp: string }> = ({
-  timestamp,
-}) => ({
-  timestamp: new firebase.firestore.Timestamp(
-    new Date(timestamp).getTime() / 1000,
-    0
-  ),
-});
 
 export const Restaurant: React.FC<RestaurantProps> = ({ user }) => {
   const { restaurant_id } = useParams();
@@ -77,7 +61,7 @@ export const Restaurant: React.FC<RestaurantProps> = ({ user }) => {
       .collection(`restaurants`)
       .doc(restaurant_id)
       .collection(`ratings`)
-      .withConverter<{ timestamp: string }>(decoder, encoder)
+      .withConverter<{ timestamp: string }>(timestampDecoder, timestampEncoder)
       .fetch()
       .then((ret) => {
         setRatings(ret);

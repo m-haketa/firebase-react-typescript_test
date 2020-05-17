@@ -1,4 +1,3 @@
-import { format } from 'date-fns/fp';
 import { firestoreWithAppSettings as f } from '../firestoreWrapper/Firestore';
 
 import * as firebase from 'firebase';
@@ -6,13 +5,7 @@ import firebaseConfig from '../firebase_config.json';
 
 import { WebFirestoreTestUtil, FieldValue } from './util';
 
-import { Database } from '../schema';
-import {
-  Substitute,
-  Decoder,
-  Encoder,
-  Timestamp,
-} from '../firestoreWrapper/type';
+import { Database, timestampDecoder, timestampEncoder } from '../schema';
 
 const util = new WebFirestoreTestUtil();
 
@@ -24,26 +17,12 @@ const settings = util.settings;
 const firestore = f<Database>(app, settings);
 
 beforeAll(async () => {
-  //await firestore.enableNetwork;
   //firebase.initializeApp(firebaseConfig);
   //await firebase.auth().signInAnonymously();
 });
 
 afterAll(async () => {
   await firestore.terminate();
-});
-
-const decoder: Decoder<{ timestamp: Timestamp }, { timestamp: string }> = ({
-  timestamp,
-}) => ({ timestamp: format('yyyy-MM-dd')(timestamp.toDate()) });
-
-const encoder: Encoder<{ timestamp: Timestamp }, { timestamp: string }> = ({
-  timestamp,
-}) => ({
-  timestamp: new firebase.firestore.Timestamp(
-    new Date(timestamp).getTime() / 1000,
-    0
-  ),
 });
 
 describe('[collection compare test]', () => {
@@ -106,7 +85,7 @@ describe('[add test]', () => {
       .collection(`restaurants`)
       .doc(addedDocId.id)
       .collection(`ratings`)
-      .withConverter(decoder, encoder);
+      .withConverter(timestampDecoder, timestampEncoder);
 
     const docRating: Parameters<typeof colRating['add']>[0] = {
       rating: 1,
