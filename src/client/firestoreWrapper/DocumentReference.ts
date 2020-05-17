@@ -68,12 +68,10 @@ export class DocumentReference<D, U> {
     return this.dImpl.set(converted, options);
   }
 
-  /*
   update(data: Partial<DocumentProps<U>>): Promise<void> {
     const converted = this.encoder ? { ...data, ...this.encoder(data) } : data;
     return this.dImpl.update(converted);
   }
-  */
 
   /* とりあえず、対応しない
   update(
