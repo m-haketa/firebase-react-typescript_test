@@ -60,7 +60,9 @@ export class CollectionReference<
   ): CollectionReference<D, Substitute<DDoc, V>> {
     return new CollectionReference<D, Substitute<DDoc, V>>(
       this.cImpl,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       decoder as any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       encoder as any
     );
   }

@@ -75,6 +75,7 @@ export class Query<
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   startAt(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     snapshot: firebase.firestore.DocumentSnapshot<any>
   ): Query<D, UDoc, DDoc, DCol>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -86,6 +87,7 @@ export class Query<
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   startAfter(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     snapshot: firebase.firestore.DocumentSnapshot<any>
   ): Query<D, UDoc, DDoc, DCol>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -97,6 +99,7 @@ export class Query<
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   endBefore(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     snapshot: firebase.firestore.DocumentSnapshot<any>
   ): Query<D, UDoc, DDoc, DCol>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -108,6 +111,7 @@ export class Query<
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   endAt(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     snapshot: firebase.firestore.DocumentSnapshot<any>
   ): Query<D, UDoc, DDoc, DCol>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -187,7 +191,9 @@ export class Query<
   ): Query<D, Substitute<DDoc, V>> {
     return new Query<D, Substitute<DDoc, V>>(
       this.qImpl,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       decoder as any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       encoder as any
     );
   }

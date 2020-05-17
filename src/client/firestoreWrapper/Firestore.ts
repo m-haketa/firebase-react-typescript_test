@@ -1,5 +1,4 @@
 import * as firebase from 'firebase';
-import * as firebaseTesting from '@firebase/testing';
 
 import { CollectionReference } from './CollectionReference';
 import type { DatabaseType } from './type';

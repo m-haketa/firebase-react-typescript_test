@@ -25,7 +25,7 @@ export type DatabaseType = {
 };
 
 export type Document = {
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 export type Collection = {
