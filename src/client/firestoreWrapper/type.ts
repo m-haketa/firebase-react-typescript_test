@@ -33,8 +33,6 @@ export type Collection = {
   _collections: { [key: string]: Collection };
 };
 
-export type KeyOfPrimitiveValue<T extends Collection> = keyof T['_documents'];
-
 export type DocumentProps<T extends Collection> = T['_documents'];
 
 export type CollectionProps<T extends Collection> = T['_collections'];
