@@ -15,6 +15,17 @@ class Firestore<D = { [key: string]: unknown }> {
     >(this.impl.collection(collectionPath));
   }
 
+  enableNetwork(): Promise<void> {
+    return this.impl.enableNetwork();
+  }
+
+  disableNetwork(): Promise<void> {
+    return this.impl.disableNetwork();
+  }
+
+  terminate(): Promise<void> {
+    return this.impl.terminate();
+  }
   /*
   settings(settings: Settings): void;
   enablePersistence(settings?: PersistenceSettings): Promise<void>;
@@ -26,8 +37,6 @@ class Firestore<D = { [key: string]: unknown }> {
   batch(): WriteBatch;
   app: firebase.app.App;
   clearPersistence(): Promise<void>;
-  enableNetwork(): Promise<void>;
-  disableNetwork(): Promise<void>;
   waitForPendingWrites(): Promise<void>;
   onSnapshotsInSync(observer: {
     next?: (value: void) => void;
@@ -35,7 +44,6 @@ class Firestore<D = { [key: string]: unknown }> {
     complete?: () => void;
   }): () => void;
   onSnapshotsInSync(onSync: () => void): () => void;
-  terminate(): Promise<void>;
   INTERNAL: { delete: () => Promise<void> };
   */
 }
