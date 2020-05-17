@@ -1,21 +1,33 @@
-import { firestore as f } from '../firestoreWrapper/Firestore';
+import { firestoreWithAppSettings as f } from '../firestoreWrapper/Firestore';
+
+import * as firebase from 'firebase';
+import firebaseConfig from '../firebase_config.json';
 
 import { WebFirestoreTestUtil, FieldValue } from './util';
 
 import { Database } from '../schema';
 
 const util = new WebFirestoreTestUtil();
-const collectionPath = 'basic';
 
-const firestore = f<Database>(util.app);
+const app = util.app;
+const settings = util.settings;
+//const app = undefined;
+//const settings = {};
 
-beforeEach(async () => {
+const firestore = f<Database>(app, settings);
+
+beforeAll(async () => {
+  //await firestore.enableNetwork;
   //firebase.initializeApp(firebaseConfig);
   //await firebase.auth().signInAnonymously();
 });
 
+afterAll(async () => {
+  await firestore.terminate();
+});
+
 describe('[collection compare test]', () => {
-  test(`compareで一致するか`, async () => {
+  test(`compareで一致するか`, () => {
     /*
     const firestoreOrig = firebase.firestore();
 
@@ -44,7 +56,7 @@ describe('[collection compare test]', () => {
 });
 
 describe('[document path]', () => {
-  test(`document pathを取得`, async () => {
+  test(`document pathを取得`, () => {
     /*
     const firestoreOrig = firebase.firestore();
 
@@ -67,8 +79,93 @@ describe('[document path]', () => {
   });
 });
 
-/*
 describe('[add test]', () => {
+  test(`restaurantsをadd`, async () => {
+    expect.assertions(1);
+
+    const col = firestore.collection(`restaurants`);
+
+    const doc = {
+      category: 'Brunch',
+      city: 'San Francisco',
+      name: 'Best Bar',
+      photo:
+        'https://storage.googleapis.com/firestorequickstarts.appspot.com/food_8.png',
+      price: 3,
+      avgRating: 0,
+      numRatings: 0,
+    };
+
+    const addedDocId = await col.add(doc).catch((e) => {
+      console.log(e.toString());
+      throw e;
+    });
+    console.log(`docId:${addedDocId.id}`);
+
+    const fetchedDoc = await col
+      .doc(addedDocId.id)
+      .get()
+      .catch((e) => {
+        console.log(e.toString());
+        throw e;
+      });
+
+    const data = fetchedDoc.data();
+    expect(data).toEqual({
+      category: doc.category,
+      city: doc.city,
+      name: doc.name,
+      photo: doc.photo,
+      price: doc.price,
+      avgRating: doc.avgRating,
+      numRatings: doc.numRatings,
+    });
+  });
+  /*
+  test(`restaurantsをadd`, async () => {
+    expect.assertions(1);
+
+    const firestore = f<Database>(app);
+    const col = firestore.collection(`restaurants`);
+
+    const doc = {
+      category: 'Brunch',
+      city: 'San Francisco',
+      name: 'Best Bar',
+      photo:
+        'https://storage.googleapis.com/firestorequickstarts.appspot.com/food_8.png',
+      price: 3,
+      avgRating: 0,
+      numRatings: 0,
+    };
+
+    const addedDocId = await col.add(doc).catch((e) => {
+      console.log(e.toString());
+      throw e;
+    });
+    console.log(`docId:${addedDocId.id}`);
+
+    const fetchedDoc = await col
+      .doc(addedDocId.id)
+      .fetch()
+      .catch((e) => {
+        console.log(e.toString());
+        throw e;
+      });
+
+    expect(fetchedDoc).toEqual({
+      _id: addedDocId.id,
+      category: doc.category,
+      city: doc.city,
+      name: doc.name,
+      photo: doc.photo,
+      price: doc.price,
+      avgRating: doc.avgRating,
+      numRatings: doc.numRatings,
+    });
+  });
+  */
+  /*
   test(`restaurantの口コミをadd`, () => {
     const firestore = f<Database>();
 
@@ -79,5 +176,5 @@ describe('[add test]', () => {
 
     expect(col).toBe();
   });
+  */
 });
-*/
