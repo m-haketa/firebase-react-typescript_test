@@ -27,17 +27,18 @@ export class CollectionReference<D, U> extends Query<D, U> {
   }
 
   doc(documentPath?: string): DocumentReference<D, U> {
-    return new DocumentReference<D, U>(this.cImpl.doc(documentPath));
+    return new DocumentReference<D, U>(
+      this.cImpl.doc(documentPath),
+      this.decoder,
+      this.encoder
+    );
   }
 
   add(data: DocumentProps<U>): Promise<DocumentReference<D, U>> {
     const converted = this.encoder ? { ...data, ...this.encoder(data) } : data;
-    return this.cImpl
-      .add(converted)
-      .then(
-        (dImplRet) =>
-          new DocumentReference(dImplRet, this.decoder, this.encoder)
-      );
+    return this.cImpl.add(converted).then((dImplRet) => {
+      return new DocumentReference(dImplRet, this.decoder, this.encoder);
+    });
   }
 
   //Vは、Dのうち置換したい項目だけ書けばOK
