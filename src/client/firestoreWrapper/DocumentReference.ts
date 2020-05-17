@@ -56,16 +56,35 @@ export class DocumentReference<D, U> {
     >(this.dImpl.collection(collectionPath));
   }
 
+  set(
+    data: DocumentProps<U>,
+    options?: firebase.firestore.SetOptions
+  ): Promise<void> {
+    const converted = this.encoder ? { ...data, ...this.encoder(data) } : data;
+    return this.dImpl.set(converted, options);
+  }
+
   /*
-  readonly parent: CollectionReference<T>;
-  set(data: T, options?: SetOptions): Promise<void>;
-  update(data: UpdateData): Promise<void>;
+  update(data: Partial<DocumentProps<U>>): Promise<void> {
+    const converted = this.encoder ? { ...data, ...this.encoder(data) } : data;
+    return this.dImpl.update(converted);
+  }
+  */
+
+  /* とりあえず、対応しない
   update(
-    field: string | FieldPath,
+    field: keyof DocumentProps<U>,
     value: any,
     ...moreFieldsAndValues: any[]
   ): Promise<void>;
-  delete(): Promise<void>;
+  */
+
+  delete(): Promise<void> {
+    return this.dImpl.delete();
+  }
+
+  /*
+  readonly parent: CollectionReference<T>;
   onSnapshot(observer: {
     next?: (snapshot: DocumentSnapshot<T>) => void;
     error?: (error: FirestoreError) => void;
