@@ -1,7 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-
-import { useEffect, useState } from 'react';
 
 import { Restaurant as RestaurantType } from './Index';
 import type { UserCredential } from '../useFirebaseInit';
