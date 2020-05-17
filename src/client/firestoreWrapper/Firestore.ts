@@ -1,13 +1,10 @@
 import * as firebase from 'firebase';
+import * as firebaseTesting from '@firebase/testing';
 
 import { CollectionReference } from './CollectionReference';
 
-class Firestore<D> {
-  private impl: firebase.firestore.Firestore;
-
-  constructor(app?: firebase.app.App) {
-    this.impl = firebase.firestore(app);
-  }
+class Firestore<D = { [key: string]: unknown }> {
+  constructor(private impl: firebase.firestore.Firestore) {}
 
   collection(
     collectionPath: string & keyof D
@@ -43,9 +40,34 @@ class Firestore<D> {
   */
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const firestore = <D = { [key: string]: any }>(
-  app?: firebase.app.App
+export const firestoreWithAppSettings = <D = { [key: string]: unknown }>(
+  app?: firebase.app.App,
+  settings?: firebase.firestore.Settings
 ): Firestore<D> => {
-  return new Firestore<D>(app);
+  const firestore = firebase.firestore(app);
+  if (settings) {
+    firestore.settings(settings);
+  }
+  return new Firestore<D>(firestore);
+};
+
+const env = 'dev'; //devかprodを切り替え
+
+export const firestore = <D = { [key: string]: unknown }>(): Firestore<D> => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // @ts-ignore
+  if (env === 'prod') {
+    return firestoreWithAppSettings<D>();
+  } else {
+    return firestoreWithAppSettings<D>(
+      firebaseTesting.initializeTestApp({
+        projectId: 'test',
+        auth: { uid: 'testuser' },
+      }),
+      {
+        host: 'localhost:8000',
+        ssl: false,
+      }
+    );
+  }
 };
