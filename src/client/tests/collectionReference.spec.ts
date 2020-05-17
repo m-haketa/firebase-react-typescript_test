@@ -48,19 +48,6 @@ const encoder: Encoder<{ timestamp: Timestamp }, { timestamp: string }> = ({
 
 describe('[collection compare test]', () => {
   test(`compareで一致するか`, () => {
-    /*
-    const firestoreOrig = firebase.firestore();
-
-    const col1orig = firestoreOrig
-      .collection(`restaurants`)
-      .doc(`uLiRemeCK1pAVkFAJCpR`)
-      .collection(`ratings`);
-
-    const col2orig = firestoreOrig
-      .collection(`restaurants`)
-      .doc(`uLiRemeCK1pAVkFAJCpR`)
-      .collection(`ratings`);
-    */
     const col1 = firestore
       .collection(`restaurants`)
       .doc(`uLiRemeCK1pAVkFAJCpR`)
@@ -77,16 +64,6 @@ describe('[collection compare test]', () => {
 
 describe('[document path]', () => {
   test(`document pathを取得`, () => {
-    /*
-    const firestoreOrig = firebase.firestore();
-
-    const doc1orig = firestoreOrig
-      .collection(`restaurants`)
-      .doc(`wbZBOzeVDOmSEOMCemxs`)
-      .collection(`ratings`)
-      .doc(`Pp0D79YzR750kelslQVG`);
-    */
-
     const c1 = `restaurants`;
     const d1 = `wbZBOzeVDOmSEOMCemxs`;
     const c2 = `ratings`;
