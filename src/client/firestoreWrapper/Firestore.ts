@@ -59,23 +59,6 @@ export const firestoreWithAppSettings = <D = { [key: string]: unknown }>(
   return new Firestore<D>(firestore);
 };
 
-const env = 'prod'; //devかprodを切り替え
-
 export const firestore = <D = { [key: string]: unknown }>(): Firestore<D> => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-  // @ts-ignore
-  //if (env === 'prod') {
   return firestoreWithAppSettings<D>();
-  /*} else {
-    return firestoreWithAppSettings<D>(
-      firebaseTesting.initializeTestApp({
-        projectId: 'test',
-        auth: { uid: 'testuser' },
-      }),
-      {
-        host: 'localhost:8000',
-        ssl: false,
-      }
-    );
-  }*/
 };
