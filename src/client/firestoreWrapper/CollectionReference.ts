@@ -3,13 +3,25 @@ import * as firebase from 'firebase';
 import { Query } from './Query';
 import { DocumentReference } from './DocumentReference';
 
-import type { DocumentProps, Substitute, Decoder, Encoder } from './type';
+import type {
+  Collection,
+  DocumentProps,
+  CollectionProps,
+  Substitute,
+  Decoder,
+  Encoder,
+} from './type';
 
-export class CollectionReference<D, U> extends Query<D, U> {
+export class CollectionReference<
+  D extends Collection,
+  UDoc = DocumentProps<D>,
+  DDoc = DocumentProps<D>,
+  DCol = CollectionProps<D>
+> extends Query<D, UDoc, DDoc, DCol> {
   constructor(
     private cImpl: firebase.firestore.CollectionReference,
-    decoder?: (dbData: Partial<DocumentProps<D>>) => Partial<DocumentProps<U>>,
-    encoder?: (userData: Partial<DocumentProps<U>>) => Partial<DocumentProps<D>>
+    decoder?: (dbData: Partial<DDoc>) => Partial<UDoc>,
+    encoder?: (userData: Partial<UDoc>) => Partial<DDoc>
   ) {
     super(cImpl, decoder, encoder);
   }
@@ -22,19 +34,19 @@ export class CollectionReference<D, U> extends Query<D, U> {
     return this.cImpl.path;
   }
 
-  isEqual(other: CollectionReference<D, U>): boolean {
+  isEqual(other: CollectionReference<D, UDoc, DDoc, DCol>): boolean {
     return this.cImpl.isEqual(other.cImpl);
   }
 
-  doc(documentPath?: string): DocumentReference<D, U> {
-    return new DocumentReference<D, U>(
+  doc(documentPath?: string): DocumentReference<D, UDoc, DDoc, DCol> {
+    return new DocumentReference<D, UDoc, DDoc, DCol>(
       this.cImpl.doc(documentPath),
       this.decoder,
       this.encoder
     );
   }
 
-  add(data: DocumentProps<U>): Promise<DocumentReference<D, U>> {
+  add(data: UDoc): Promise<DocumentReference<D, UDoc, DDoc, DCol>> {
     const converted = this.encoder ? { ...data, ...this.encoder(data) } : data;
     return this.cImpl.add(converted).then((dImplRet) => {
       return new DocumentReference(dImplRet, this.decoder, this.encoder);
@@ -43,10 +55,10 @@ export class CollectionReference<D, U> extends Query<D, U> {
 
   //Vは、Dのうち置換したい項目だけ書けばOK
   withConverter<V extends object>(
-    decoder: Decoder<DocumentProps<D>, V>,
-    encoder: Encoder<DocumentProps<D>, V>
-  ): CollectionReference<D, Substitute<D, V>> {
-    return new CollectionReference<D, Substitute<D, V>>(
+    decoder: Decoder<DDoc, V>,
+    encoder: Encoder<DDoc, V>
+  ): CollectionReference<D, Substitute<DDoc, V>> {
+    return new CollectionReference<D, Substitute<DDoc, V>>(
       this.cImpl,
       decoder as any,
       encoder as any

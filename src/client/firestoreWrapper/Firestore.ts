@@ -2,17 +2,17 @@ import * as firebase from 'firebase';
 import * as firebaseTesting from '@firebase/testing';
 
 import { CollectionReference } from './CollectionReference';
+import type { DatabaseType } from './type';
 
-class Firestore<D = { [key: string]: unknown }> {
+class Firestore<D extends DatabaseType = DatabaseType> {
   constructor(private impl: firebase.firestore.Firestore) {}
 
   collection(
     collectionPath: string & keyof D
-  ): CollectionReference<D[typeof collectionPath], D[typeof collectionPath]> {
-    return new CollectionReference<
-      D[typeof collectionPath],
-      D[typeof collectionPath]
-    >(this.impl.collection(collectionPath));
+  ): CollectionReference<D[typeof collectionPath]> {
+    return new CollectionReference<D[typeof collectionPath]>(
+      this.impl.collection(collectionPath)
+    );
   }
 
   enableNetwork(): Promise<void> {
@@ -48,7 +48,7 @@ class Firestore<D = { [key: string]: unknown }> {
   */
 }
 
-export const firestoreWithAppSettings = <D = { [key: string]: unknown }>(
+export const firestoreWithAppSettings = <D extends DatabaseType = DatabaseType>(
   app?: firebase.app.App,
   settings?: firebase.firestore.Settings
 ): Firestore<D> => {
@@ -59,6 +59,8 @@ export const firestoreWithAppSettings = <D = { [key: string]: unknown }>(
   return new Firestore<D>(firestore);
 };
 
-export const firestore = <D = { [key: string]: unknown }>(): Firestore<D> => {
+export const firestore = <D extends DatabaseType = DatabaseType>(): Firestore<
+  D
+> => {
   return firestoreWithAppSettings<D>();
 };

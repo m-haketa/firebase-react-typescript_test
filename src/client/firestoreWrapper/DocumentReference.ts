@@ -1,17 +1,18 @@
 import * as firebase from 'firebase';
 
 import { CollectionReference } from './CollectionReference';
-import { DocumentProps, CollectionProps, WithId } from './type';
+import { Collection, DocumentProps, CollectionProps, WithId } from './type';
 
-export class DocumentReference<D, U> {
+export class DocumentReference<
+  D extends Collection,
+  UDoc = DocumentProps<D>,
+  DDoc = DocumentProps<D>,
+  DCol = CollectionProps<D>
+> {
   constructor(
     private dImpl: firebase.firestore.DocumentReference,
-    private decoder?: (
-      dbData: Partial<DocumentProps<D>>
-    ) => Partial<DocumentProps<U>>,
-    private encoder?: (
-      userData: Partial<DocumentProps<U>>
-    ) => Partial<DocumentProps<D>>
+    protected decoder?: (dbData: Partial<DDoc>) => Partial<UDoc>,
+    protected encoder?: (userData: Partial<UDoc>) => Partial<DDoc>
   ) {}
 
   get firestore(): firebase.firestore.Firestore {
@@ -26,56 +27,52 @@ export class DocumentReference<D, U> {
     return this.dImpl.path;
   }
 
-  isEqual(other: DocumentReference<D, U>): boolean {
+  isEqual(other: DocumentReference<D, UDoc, DDoc, DCol>): boolean {
     return this.dImpl.isEqual(other.dImpl);
   }
 
   get(
     options?: firebase.firestore.GetOptions
-  ): Promise<firebase.firestore.DocumentSnapshot<DocumentProps<D>>> {
+  ): Promise<firebase.firestore.DocumentSnapshot<DDoc>> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.dImpl.get(options) as any;
   }
 
   fetch(
     options?: firebase.firestore.GetOptions
-  ): Promise<WithId<DocumentProps<U>> | undefined> {
+  ): Promise<WithId<UDoc> | undefined> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.dImpl.get(options).then((doc) => {
       const data = doc.data();
       if (data === undefined) return undefined;
 
-      const decoded = this.decoder ? this.decoder(data as D) : data;
+      const decoded = this.decoder ? this.decoder(data as DDoc) : data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return { _id: doc.id, ...data, ...decoded } as any;
     });
   }
 
   collection(
-    collectionPath: string & keyof CollectionProps<D> & keyof CollectionProps<U>
-  ): CollectionReference<D[typeof collectionPath], U[typeof collectionPath]> {
-    return new CollectionReference<
-      D[typeof collectionPath],
-      U[typeof collectionPath]
-    >(this.dImpl.collection(collectionPath));
+    collectionPath: string & keyof DCol
+  ): CollectionReference<D['_collections'][typeof collectionPath]> {
+    return new CollectionReference<D['_collections'][typeof collectionPath]>(
+      this.dImpl.collection(collectionPath)
+    );
   }
 
-  set(
-    data: DocumentProps<U>,
-    options?: firebase.firestore.SetOptions
-  ): Promise<void> {
+  set(data: UDoc, options?: firebase.firestore.SetOptions): Promise<void> {
     const converted = this.encoder ? { ...data, ...this.encoder(data) } : data;
     return this.dImpl.set(converted, options);
   }
 
-  update(data: Partial<DocumentProps<U>>): Promise<void> {
+  update(data: Partial<UDoc>): Promise<void> {
     const converted = this.encoder ? { ...data, ...this.encoder(data) } : data;
     return this.dImpl.update(converted);
   }
 
   /* とりあえず、対応しない
   update(
-    field: keyof DocumentProps<U>,
+    field: keyof UDoc,
     value: any,
     ...moreFieldsAndValues: any[]
   ): Promise<void>;

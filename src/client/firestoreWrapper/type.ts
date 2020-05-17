@@ -19,21 +19,25 @@ export type Timestamp = firebase.firestore.Timestamp;
 //
 //そこで、propertyのデータ型がprimitiveかどうかを判断するtypeを作る。
 //TimestampとDateはPrimitiveとして扱う
-export type KeyOfPrimitiveValue<T> = {
-  [K in keyof T]: T[K] extends Timestamp
-    ? K
-    : T[K] extends Date
-    ? K
-    : T[K] extends object
-    ? never //Timestamp、Date型以外のobjectは、collectionの名前とみなす
-    : K;
-} extends { [_ in keyof T]: infer X }
-  ? X
-  : never;
 
-export type DocumentProps<T> = Pick<T, KeyOfPrimitiveValue<T>>;
+export type DatabaseType = {
+  [key: string]: Collection;
+};
 
-export type CollectionProps<T> = Omit<T, KeyOfPrimitiveValue<T>>;
+export type Document = {
+  [key: string]: any;
+};
+
+export type Collection = {
+  _documents: Document;
+  _collections: { [key: string]: Collection };
+};
+
+export type KeyOfPrimitiveValue<T extends Collection> = keyof T['_documents'];
+
+export type DocumentProps<T extends Collection> = T['_documents'];
+
+export type CollectionProps<T extends Collection> = T['_collections'];
 
 export type WithId<T> = T & { _id: string };
 
