@@ -8,8 +8,8 @@ import type { DocumentProps, Substitute, Decoder, Encoder } from './type';
 export class CollectionReference<D, U> extends Query<D, U> {
   constructor(
     private cImpl: firebase.firestore.CollectionReference,
-    decoder?: (dbData: DocumentProps<D>) => Partial<DocumentProps<U>>,
-    encoder?: (userData: DocumentProps<U>) => Partial<DocumentProps<D>>
+    decoder?: (dbData: Partial<DocumentProps<D>>) => Partial<DocumentProps<U>>,
+    encoder?: (userData: Partial<DocumentProps<U>>) => Partial<DocumentProps<D>>
   ) {
     super(cImpl, decoder, encoder);
   }

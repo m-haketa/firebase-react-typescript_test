@@ -11,9 +11,11 @@ import type {
 export class Query<D, U> {
   constructor(
     private qImpl: firebase.firestore.Query,
-    protected decoder?: (dbData: DocumentProps<D>) => Partial<DocumentProps<U>>,
+    protected decoder?: (
+      dbData: Partial<DocumentProps<D>>
+    ) => Partial<DocumentProps<U>>,
     protected encoder?: (
-      userData: DocumentProps<U>
+      userData: Partial<DocumentProps<U>>
     ) => Partial<DocumentProps<D>>
   ) {}
 
