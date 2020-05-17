@@ -3,11 +3,11 @@ import { firestoreWithAppSettings as f } from '../firestoreWrapper/Firestore';
 import * as firebase from 'firebase';
 import firebaseConfig from '../firebase_config.json';
 
-import { WebFirestoreTestUtil, FieldValue } from './util';
+import { WebFirestoreTestUtil } from './util';
 
 import { Database, timestampDecoder, timestampEncoder } from '../schema';
 
-const util = new WebFirestoreTestUtil();
+const util = new WebFirestoreTestUtil({ isAdmin: false });
 
 const app = util.app;
 const settings = util.settings;

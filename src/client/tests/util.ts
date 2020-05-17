@@ -14,17 +14,22 @@ export class WebFirestoreTestUtil {
   settings: firebase.firestore.Settings;
   webFirestore: firebase.firestore.Firestore;
 
-  constructor() {
+  constructor({ isAdmin = false }: { isAdmin: boolean }) {
     // Use random projectId to separate emulator firestore namespace for concurrent testing
     const randomStr = crypto.randomBytes(10).toString('hex');
     this.projectId = `test-${randomStr}`;
     this.uid = 'test-user';
 
-    this.app = firebase.initializeTestApp({
-      projectId: this.projectId,
-      auth: { uid: this.uid },
-    });
-
+    if (isAdmin) {
+      this.app = firebase.initializeAdminApp({
+        projectId: this.projectId,
+      });
+    } else {
+      this.app = firebase.initializeTestApp({
+        projectId: this.projectId,
+        auth: { uid: this.uid },
+      });
+    }
     this.settings = {
       host: 'localhost:8000',
       ssl: false,
