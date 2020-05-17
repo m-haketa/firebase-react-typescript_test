@@ -1,3 +1,4 @@
+import { format } from 'date-fns/fp';
 import { firestoreWithAppSettings as f } from '../firestoreWrapper/Firestore';
 
 import * as firebase from 'firebase';
@@ -6,6 +7,12 @@ import firebaseConfig from '../firebase_config.json';
 import { WebFirestoreTestUtil, FieldValue } from './util';
 
 import { Database } from '../schema';
+import {
+  Substitute,
+  Decoder,
+  Encoder,
+  Timestamp,
+} from '../firestoreWrapper/type';
 
 const util = new WebFirestoreTestUtil();
 
@@ -24,6 +31,19 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await firestore.terminate();
+});
+
+const decoder: Decoder<{ timestamp: Timestamp }, { timestamp: string }> = ({
+  timestamp,
+}) => ({ timestamp: format('yyyy-MM-dd')(timestamp.toDate()) });
+
+const encoder: Encoder<{ timestamp: Timestamp }, { timestamp: string }> = ({
+  timestamp,
+}) => ({
+  timestamp: new firebase.firestore.Timestamp(
+    new Date(timestamp).getTime() / 1000,
+    0
+  ),
 });
 
 describe('[collection compare test]', () => {
@@ -81,11 +101,11 @@ describe('[document path]', () => {
 
 describe('[add test]', () => {
   test(`restaurantsをadd`, async () => {
-    expect.assertions(1);
+    expect.assertions(2);
 
     const col = firestore.collection(`restaurants`);
 
-    const doc = {
+    const doc: Parameters<typeof col['add']>[0] = {
       category: 'Brunch',
       city: 'San Francisco',
       name: 'Best Bar',
@@ -96,85 +116,45 @@ describe('[add test]', () => {
       numRatings: 0,
     };
 
-    const addedDocId = await col.add(doc).catch((e) => {
-      console.log(e.toString());
-      throw e;
-    });
+    const addedDocId = await col.add(doc);
+
     console.log(`docId:${addedDocId.id}`);
 
-    const fetchedDoc = await col
-      .doc(addedDocId.id)
-      .get()
-      .catch((e) => {
-        console.log(e.toString());
-        throw e;
-      });
+    const fetchedDoc = await col.doc(addedDocId.id).get();
 
     const data = fetchedDoc.data();
-    expect(data).toEqual({
-      category: doc.category,
-      city: doc.city,
-      name: doc.name,
-      photo: doc.photo,
-      price: doc.price,
-      avgRating: doc.avgRating,
-      numRatings: doc.numRatings,
-    });
-  });
-  /*
-  test(`restaurantsをadd`, async () => {
-    expect.assertions(1);
+    expect(data).toEqual(doc);
 
-    const firestore = f<Database>(app);
-    const col = firestore.collection(`restaurants`);
+    const colRating = firestore
+      .collection(`restaurants`)
+      .doc(addedDocId.id)
+      .collection(`ratings`)
+      .withConverter(decoder, encoder);
 
-    const doc = {
-      category: 'Brunch',
-      city: 'San Francisco',
-      name: 'Best Bar',
-      photo:
-        'https://storage.googleapis.com/firestorequickstarts.appspot.com/food_8.png',
-      price: 3,
-      avgRating: 0,
-      numRatings: 0,
+    const docRating: Parameters<typeof colRating['add']>[0] = {
+      rating: 1,
+      text: 'good!',
+      timestamp: '2020-05-17',
+      userId: 'test-user',
+      userName: 'test-user',
     };
 
-    const addedDocId = await col.add(doc).catch((e) => {
+    console.log({ docRating });
+    const addedRatingDoc = await colRating.add(docRating).catch((e) => {
       console.log(e.toString());
       throw e;
     });
-    console.log(`docId:${addedDocId.id}`);
 
-    const fetchedDoc = await col
-      .doc(addedDocId.id)
+    console.log(`ratingDocId:${addedRatingDoc.id}`);
+
+    const fetchedRating = await colRating
+      .doc(addedRatingDoc.id)
       .fetch()
       .catch((e) => {
         console.log(e.toString());
         throw e;
       });
 
-    expect(fetchedDoc).toEqual({
-      _id: addedDocId.id,
-      category: doc.category,
-      city: doc.city,
-      name: doc.name,
-      photo: doc.photo,
-      price: doc.price,
-      avgRating: doc.avgRating,
-      numRatings: doc.numRatings,
-    });
+    expect(fetchedRating).toEqual({ ...docRating, _id: addedRatingDoc.id });
   });
-  */
-  /*
-  test(`restaurantの口コミをadd`, () => {
-    const firestore = f<Database>();
-
-    const col = firestore
-      .collection(`restaurants`)
-      .doc(`uLiRemeCK1pAVkFAJCpR`)
-      .collection(`ratings`);
-
-    expect(col).toBe();
-  });
-  */
 });
