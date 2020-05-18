@@ -1,6 +1,8 @@
 import { firestoreWithAppSettings } from '../firestoreWrapper/Firestore';
 import { WebFirestoreTestUtil } from './util';
 
+import * as R from 'ramda';
+
 import { timestampDecoder, timestampEncoder } from '../schema';
 import type { DocumentProps } from '../firestoreWrapper/type';
 
@@ -101,5 +103,26 @@ describe('[query where]', () => {
         _id: expect.anything(),
       },
     ]);
+  });
+});
+
+describe('[query orderBy]', () => {
+  test(`orderBy`, async () => {
+    const data = await firestore
+      .collection('data')
+      .orderBy('value', 'asc')
+      .fetch();
+    console.log(data);
+
+    const sortedTestData = testData.sort(sortValue);
+
+    const zipped = R.zip(data, sortedTestData);
+    zipped.map(([d, td]) =>
+      expect(d).toEqual({
+        name: td.name,
+        value: td.value,
+        _id: expect.anything(),
+      })
+    );
   });
 });
