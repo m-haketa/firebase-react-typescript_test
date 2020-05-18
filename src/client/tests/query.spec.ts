@@ -42,6 +42,9 @@ const testData: DocumentProps<Schema['data']>[] = [
   { name: 'bcd', value: 15 },
 ];
 
+const sortValue = (a: { value: number }, b: { value: number }): number =>
+  a.value > b.value ? 1 : a.value === b.value ? 0 : -1;
+
 beforeAll(async () => {
   const col = firestore.collection('data');
   testData.forEach((data) => {
@@ -62,5 +65,23 @@ describe('[query get]', () => {
     });
     console.log(data);
     expect(data).toEqual(expect.arrayContaining(testData));
+  });
+});
+
+describe('[query fetch]', () => {
+  test(`fetch`, async () => {
+    const data = await firestore.collection('data').fetch();
+    console.log(data);
+
+    const sortedData = data.sort(sortValue);
+    const sortedTestData = testData.sort(sortValue);
+
+    for (let c = 0; c < sortedData.length; c++) {
+      expect(sortedData[c]).toEqual({
+        name: sortedTestData[c].name,
+        value: sortedTestData[c].value,
+        _id: expect.anything(),
+      });
+    }
   });
 });
