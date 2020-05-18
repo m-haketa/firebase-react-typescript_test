@@ -85,3 +85,21 @@ describe('[query fetch]', () => {
     }
   });
 });
+
+describe('[query where]', () => {
+  test(`where`, async () => {
+    const data = await firestore
+      .collection('data')
+      .where('value', '==', 80)
+      .fetch();
+    console.log(data);
+
+    expect(data).toEqual([
+      {
+        name: 'yza',
+        value: 80,
+        _id: expect.anything(),
+      },
+    ]);
+  });
+});
