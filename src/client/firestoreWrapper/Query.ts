@@ -46,10 +46,10 @@ export class Query<
     });
   }
 
-  where(
-    fieldPath: string | firebase.firestore.FieldPath,
+  where<T extends keyof DDoc>(
+    fieldPath: (T & string) | firebase.firestore.FieldPath,
     opStr: firebase.firestore.WhereFilterOp,
-    value: unknown
+    value: DDoc[T]
   ): Query<D, UDoc, DDoc, DCol> {
     return new Query<D, UDoc, DDoc, DCol>(
       this.qImpl.where(fieldPath, opStr, value)
