@@ -127,3 +127,53 @@ describe('[query orderBy]', () => {
     );
   });
 });
+
+describe('[query limit]', () => {
+  test(`limit`, async () => {
+    const data = await firestore
+      .collection('data')
+      .orderBy('value', 'asc')
+      .limit(5)
+      .fetch();
+    console.log(data);
+
+    const sortedTestData = testData.sort(sortValue);
+
+    //dataの件数分（＝5件）zipする
+    const zipped = R.zip(data, sortedTestData);
+    zipped.map(([d, td]) =>
+      expect(d).toEqual({
+        name: td.name,
+        value: td.value,
+        _id: expect.anything(),
+      })
+    );
+  });
+});
+
+describe('[query limitToLast]', () => {
+  test(`limitToLast`, async () => {
+    const data = await firestore
+      .collection('data')
+      .orderBy('value', 'asc')
+      .limitToLast(5)
+      .fetch();
+    console.log(data);
+
+    //dataはascでsort後最後の5件。それを逆順にする
+    const sortedData = data.reverse();
+
+    //testDataもascでsort後逆順にする。これで、先頭5件は一致するはず
+    const sortedTestData = testData.sort(sortValue).reverse();
+
+    //sortedDataの件数分（＝5件）zipする
+    const zipped = R.zip(sortedData, sortedTestData);
+    zipped.map(([d, td]) =>
+      expect(d).toEqual({
+        name: td.name,
+        value: td.value,
+        _id: expect.anything(),
+      })
+    );
+  });
+});
