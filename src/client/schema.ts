@@ -30,19 +30,22 @@ export type Database = {
   };
 };
 
+export const timestampToString = (timestamp: Timestamp): string =>
+  format('yyyy-MM-dd')(timestamp.toDate());
+
+export const stringToTimestamp = (stringDate: string): Timestamp =>
+  new firebase.firestore.Timestamp(new Date(stringDate).getTime() / 1000, 0);
+
 export const timestampDecoder: Decoder<
   { timestamp: Timestamp },
   { timestamp: string }
 > = ({ timestamp }) => ({
-  timestamp: format('yyyy-MM-dd')(timestamp.toDate()),
+  timestamp: timestampToString(timestamp),
 });
 
 export const timestampEncoder: Encoder<
   { timestamp: Timestamp },
   { timestamp: string }
 > = ({ timestamp }) => ({
-  timestamp: new firebase.firestore.Timestamp(
-    new Date(timestamp).getTime() / 1000,
-    0
-  ),
+  timestamp: stringToTimestamp(timestamp),
 });

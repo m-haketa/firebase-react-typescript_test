@@ -3,8 +3,12 @@ import { WebFirestoreTestUtil } from './util';
 
 import * as R from 'ramda';
 
-import { timestampDecoder, timestampEncoder } from '../schema';
-import type { DocumentProps } from '../firestoreWrapper/type';
+import {
+  stringToTimestamp as st,
+  timestampDecoder,
+  timestampEncoder,
+} from '../schema';
+import type { DocumentProps, CollectionProps } from '../firestoreWrapper/type';
 
 //schema定義（まずは、具体的な値で）
 //作成するときには、いったん、DatabaseType型で作成すると、制約がかかるので書きやすい
@@ -19,7 +23,7 @@ const schema /* :DatabaseType */ = {
       subdata: {
         _documents: {
           name: 'aaa',
-          value: 10,
+          timestamp: st('2020-05-10'),
         },
         _collections: {},
       },
@@ -44,13 +48,66 @@ const testData: DocumentProps<Schema['data']>[] = [
   { name: 'bcd', value: 15 },
 ];
 
+const testData2: DocumentProps<
+  CollectionProps<Schema['data']>['subdata']
+>[][] = [
+  [
+    { name: 'AAA', timestamp: st('2020-05-10') },
+    { name: 'BBB', timestamp: st('2020-05-11') },
+  ],
+  [
+    { name: 'CCC', timestamp: st('2020-05-12') },
+    { name: 'DDD', timestamp: st('2020-05-13') },
+  ],
+  [
+    { name: 'EEE', timestamp: st('2020-05-14') },
+    { name: 'FFF', timestamp: st('2020-05-15') },
+  ],
+  [
+    { name: 'GGG', timestamp: st('2020-05-16') },
+    { name: 'HHH', timestamp: st('2020-05-17') },
+  ],
+  [
+    { name: 'III', timestamp: st('2020-05-18') },
+    { name: 'JJJ', timestamp: st('2020-05-19') },
+  ],
+  [
+    { name: 'KKK', timestamp: st('2020-05-20') },
+    { name: 'LLL', timestamp: st('2020-04-20') },
+  ],
+  [
+    { name: 'MMM', timestamp: st('2020-03-20') },
+    { name: 'NNN', timestamp: st('2020-02-20') },
+  ],
+  [
+    { name: 'OOO', timestamp: st('2020-01-20') },
+    { name: 'PPP', timestamp: st('2019-12-20') },
+  ],
+  [
+    { name: 'QQQ', timestamp: st('2019-11-20') },
+    { name: 'RRR', timestamp: st('2019-10-20') },
+  ],
+  [
+    { name: 'SSS', timestamp: st('2019-09-20') },
+    { name: 'TTT', timestamp: st('2019-08-20') },
+  ],
+];
+
 const sortValue = (a: { value: number }, b: { value: number }): number =>
   a.value > b.value ? 1 : a.value === b.value ? 0 : -1;
 
 beforeAll(async () => {
   const col = firestore.collection('data');
-  testData.forEach((data) => {
-    col.add(data);
+  const docIds: string[] = [];
+  testData.forEach(async (data) => {
+    const doc = await col.add(data);
+    docIds.push(doc.id);
+  });
+
+  const docIdAndDatas = R.zip(docIds, testData2);
+  docIdAndDatas.map(([docId, datas]) => {
+    const subCol = col.doc(docId).collection('subdata');
+    datas.forEach((data) => subCol.add(data));
   });
 });
 
