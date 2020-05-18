@@ -78,13 +78,14 @@ describe('[query fetch]', () => {
     const sortedData = data.sort(sortValue);
     const sortedTestData = testData.sort(sortValue);
 
-    for (let c = 0; c < sortedData.length; c++) {
-      expect(sortedData[c]).toEqual({
-        name: sortedTestData[c].name,
-        value: sortedTestData[c].value,
+    const zipped = R.zip(sortedData, sortedTestData);
+    zipped.map(([d, td]) =>
+      expect(d).toEqual({
+        name: td.name,
+        value: td.value,
         _id: expect.anything(),
-      });
-    }
+      })
+    );
   });
 });
 
