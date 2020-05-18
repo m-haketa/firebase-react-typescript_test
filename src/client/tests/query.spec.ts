@@ -234,3 +234,34 @@ describe('[query limitToLast]', () => {
     );
   });
 });
+
+describe('[query withConverter]', () => {
+  test(`withConverter`, async () => {
+    const baseDoc = await firestore
+      .collection('data')
+      .where('name', '==', 'abc')
+      .fetch();
+
+    const fetchedData = await firestore
+      .collection('data')
+      .doc(baseDoc[0]._id)
+      .collection('subdata')
+      .withConverter(timestampDecoder, timestampEncoder)
+      .fetch();
+
+    const expectedData = [
+      { name: 'AAA', timestamp: '2020-05-10' },
+      { name: 'BBB', timestamp: '2020-05-11' },
+    ];
+
+    //sortedDataの件数分（＝5件）zipする
+    const zipped = R.zip(fetchedData, expectedData);
+    zipped.map(([d, td]) =>
+      expect(d).toEqual({
+        name: td.name,
+        timestamp: td.timestamp,
+        _id: expect.anything(),
+      })
+    );
+  });
+});
