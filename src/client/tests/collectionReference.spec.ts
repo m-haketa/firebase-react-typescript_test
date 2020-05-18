@@ -1,5 +1,6 @@
 import { firestoreWithAppSettings as f } from '../firestoreWrapper/Firestore';
 
+/*
 import * as firebase from 'firebase';
 import firebaseConfig from '../firebase_config.json';
 
@@ -114,3 +115,4 @@ describe('[add test]', () => {
     expect(fetchedRating).toEqual({ ...docRating, _id: addedRatingDoc.id });
   });
 });
+*/
