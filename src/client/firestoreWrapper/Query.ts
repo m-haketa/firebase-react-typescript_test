@@ -56,8 +56,8 @@ export class Query<
     );
   }
 
-  orderBy(
-    fieldPath: string | firebase.firestore.FieldPath,
+  orderBy<T extends keyof DDoc>(
+    fieldPath: (T & string) | firebase.firestore.FieldPath,
     directionStr?: firebase.firestore.OrderByDirection
   ): Query<D, UDoc, DDoc, DCol> {
     return new Query<D, UDoc, DDoc, DCol>(
