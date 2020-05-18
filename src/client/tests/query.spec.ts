@@ -53,7 +53,7 @@ afterAll(async () => {
   await firestore.terminate();
 });
 
-describe('[query test]', () => {
+describe('[query get]', () => {
   test(`get`, async () => {
     const get = await firestore.collection('data').get();
     const data = get.docs.map((doc) => {
