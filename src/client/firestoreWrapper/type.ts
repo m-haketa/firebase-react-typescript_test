@@ -1,24 +1,33 @@
 export type Timestamp = firebase.firestore.Timestamp;
 
 //collection-document-collection・・・の構造を、オブジェクトで表す。
-//{
-//  collection1: {
-//    documentprops1: string;
-//    ...
-//    documentpropsn: boolean;
 //
-//    collection2: {
-//      documentprops1: string;
-//      ...
-//      documentpropsn: boolean;
-//    }
-//  }
-//}
-//中身がobject（Date、Timestampを除く）のものはcollectionとみなす。
-//残りは、documentとして取り扱う。
-//
-//そこで、propertyのデータ型がprimitiveかどうかを判断するtypeを作る。
-//TimestampとDateはPrimitiveとして扱う
+//例：
+//export type Database = {
+//  restaurants: {
+//    _documents: {
+//      avgRating: number;
+//      category: string;
+//      city: string;
+//      name: string;
+//      numRatings: number;
+//      photo: string;
+//      price: number;
+//    };
+//    _collections: {
+//      ratings: {
+//        _documents: {
+//          rating: number;
+//          text: string;
+//          timestamp: Timestamp;
+//          userId: string;
+//          userName: string;
+//        };
+//        _collections: {};
+//      };
+//    };
+//  };
+//};
 
 export type DatabaseType = {
   [key: string]: Collection;
