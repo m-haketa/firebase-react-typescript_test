@@ -157,27 +157,18 @@ export class Query<
     let retArr: WithId<UDoc>[] = [];
 
     return this.onSnapshot((snapshot) => {
-      if (!snapshot.size) {
-        retArr = [];
-      } else {
-        snapshot.docChanges().forEach((change) => {
-          if (change.type === 'removed') {
-            retArr = retArr.filter((data) => data._id !== change.doc.id);
-          } else {
-            const changeDoc = change.doc;
-            const changeDocData = changeDoc.data();
-            const decoded = this.decoder ? this.decoder(changeDocData) : {};
+      retArr = [];
+      snapshot.forEach((doc) => {
+        const docData = doc.data();
+        const decoded = this.decoder ? this.decoder(docData) : {};
 
-            retArr = retArr.filter((data) => data._id !== change.doc.id);
-            retArr.push({
-              _id: changeDoc.id,
-              ...changeDocData,
-              ...decoded,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            } as any);
-          }
-        });
-      }
+        retArr.push({
+          _id: doc.id,
+          ...docData,
+          ...decoded,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any);
+      });
       callback(retArr);
     });
   }
