@@ -261,7 +261,7 @@ describe('[query startat]', () => {
     actVsExpAndIdCheck(expect, data, sortedTestData);
   });
 
-  test(`startat value object`, async () => {
+  test(`startat values`, async () => {
     const data = await firestore
       .collection('data')
       .orderBy('value', 'asc')
@@ -299,7 +299,7 @@ describe('[query startafter]', () => {
     actVsExpAndIdCheck(expect, data, sortedTestData);
   });
 
-  test(`startAfter value object`, async () => {
+  test(`startAfter values`, async () => {
     const data = await firestore
       .collection('data')
       .orderBy('value', 'asc')
