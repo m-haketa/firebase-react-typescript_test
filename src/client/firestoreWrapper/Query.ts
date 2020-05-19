@@ -9,7 +9,6 @@ import type {
   Encoder,
   Push,
   TupleStyle,
-  ObjectStyle,
 } from './type';
 
 export class Query<
@@ -75,13 +74,11 @@ export class Query<
     return new Query<D, UDoc, Order>(this.qImpl.limitToLast(limit));
   }
 
-  startAt(params: ObjectStyle<Order>): Query<D, UDoc, Order>;
-  startAt(params: TupleStyle<Order>): Query<D, UDoc, Order>;
-  startAt(...params: TupleStyle<Order>): Query<D, UDoc, Order>;
   startAt(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     snapshot: firebase.firestore.DocumentSnapshot<any>
   ): Query<D, UDoc, Order>;
+  startAt(...params: TupleStyle<Order>): Query<D, UDoc, Order>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   startAt(...params: any[]): Query<D, UDoc, Order> {
     //if (params[0] instanceof firebase.firestore.DocumentSnapshot) {
