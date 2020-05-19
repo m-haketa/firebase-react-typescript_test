@@ -311,6 +311,82 @@ describe('[query startafter]', () => {
   });
 });
 
+describe('[query endAt]', () => {
+  const sortedTestData = testData.filter((v) => v.value <= 50).sort(sortValue);
+
+  const orderedCollection = firestore
+    .collection('data')
+    .orderBy('value', 'asc');
+
+  test(`endAt snapshot`, async () => {
+    const snapshot = await firestore
+      .collection('data')
+      .where('value', '==', 50)
+      .get();
+
+    //基準となるドキュメント（valueが50のもの）
+    const doc = snapshot.docs[0];
+    const data = await orderedCollection.endAt(doc).fetch();
+
+    actVsExpAndIdCheck(expect, data, sortedTestData);
+  });
+
+  test(`endAt value`, async () => {
+    const data = await orderedCollection.endAt(50).fetch();
+
+    actVsExpAndIdCheck(expect, data, sortedTestData);
+  });
+
+  test(`endAt values`, async () => {
+    const data = await firestore
+      .collection('data')
+      .orderBy('value', 'asc')
+      .orderBy('name')
+      .endAt(50, 'jkl')
+      .fetch();
+
+    actVsExpAndIdCheck(expect, data, sortedTestData);
+  });
+});
+
+describe('[query endBefore]', () => {
+  const sortedTestData = testData.filter((v) => v.value < 50).sort(sortValue);
+
+  const orderedCollection = firestore
+    .collection('data')
+    .orderBy('value', 'asc');
+
+  test(`endBefore snapshot`, async () => {
+    const snapshot = await firestore
+      .collection('data')
+      .where('value', '==', 50)
+      .get();
+
+    //基準となるドキュメント（valueが50のもの）
+    const doc = snapshot.docs[0];
+    const data = await orderedCollection.endBefore(doc).fetch();
+
+    actVsExpAndIdCheck(expect, data, sortedTestData);
+  });
+
+  test(`endBefore value`, async () => {
+    const data = await orderedCollection.endBefore(50).fetch();
+
+    actVsExpAndIdCheck(expect, data, sortedTestData);
+  });
+
+  test(`endBefore values`, async () => {
+    const data = await firestore
+      .collection('data')
+      .orderBy('value', 'asc')
+      .orderBy('name')
+      .endBefore(50, 'jkl')
+      .fetch();
+
+    actVsExpAndIdCheck(expect, data, sortedTestData);
+  });
+});
+
 describe('[query withConverter]', () => {
   test(`withConverter`, async () => {
     const fetchedData = await firestore
