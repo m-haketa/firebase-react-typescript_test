@@ -8,7 +8,10 @@ import {
   timestampDecoder,
   timestampEncoder,
 } from '../schema';
-import type { DocumentProps, CollectionProps } from '../firestoreWrapper/type';
+import type {
+  DocumentProps,
+  SubCollectionProps,
+} from '../firestoreWrapper/type';
 
 //schema定義（まずは、具体的な値で）
 //作成するときには、いったん、DatabaseType型で作成すると、制約がかかるので書きやすい
@@ -65,7 +68,7 @@ const testData2: DocumentProps<Schema['data2']>[] = [
 ];
 
 const testData1_1: DocumentProps<
-  CollectionProps<Schema['data']>['subdata']
+  SubCollectionProps<Schema['data']>['subdata']
 >[][] = [
   [
     { name: 'AAA', timestamp: st('2020-05-10') },
