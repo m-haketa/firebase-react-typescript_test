@@ -34,7 +34,7 @@ export const timestampToString = (timestamp: Timestamp): string =>
   format('yyyy-MM-dd')(timestamp.toDate());
 
 export const stringToTimestamp = (stringDate: string): Timestamp =>
-  new firebase.firestore.Timestamp(new Date(stringDate).getTime() / 1000, 0);
+  firebase.firestore.Timestamp.fromDate(new Date(stringDate));
 
 export const timestampDecoder: Decoder<
   { timestamp: Timestamp },
