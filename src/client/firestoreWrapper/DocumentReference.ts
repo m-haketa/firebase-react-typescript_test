@@ -1,18 +1,13 @@
 import * as firebase from 'firebase';
 
 import { CollectionReference } from './CollectionReference';
-import { Collection, DocumentProps, CollectionProps, WithId } from './type';
+import { Collection, DocumentProps, WithId } from './type';
 
-export class DocumentReference<
-  D extends Collection,
-  UDoc = DocumentProps<D>,
-  DDoc = DocumentProps<D>,
-  DCol = CollectionProps<D>
-> {
+export class DocumentReference<D extends Collection, UDoc = DocumentProps<D>> {
   constructor(
     private dImpl: firebase.firestore.DocumentReference,
-    protected decoder?: (dbData: Partial<DDoc>) => Partial<UDoc>,
-    protected encoder?: (userData: Partial<UDoc>) => Partial<DDoc>
+    protected decoder?: (dbData: Partial<DocumentProps<D>>) => Partial<UDoc>,
+    protected encoder?: (userData: Partial<UDoc>) => Partial<DocumentProps<D>>
   ) {}
 
   get firestore(): firebase.firestore.Firestore {
@@ -27,13 +22,13 @@ export class DocumentReference<
     return this.dImpl.path;
   }
 
-  isEqual(other: DocumentReference<D, UDoc, DDoc, DCol>): boolean {
+  isEqual(other: DocumentReference<D, UDoc>): boolean {
     return this.dImpl.isEqual(other.dImpl);
   }
 
   get(
     options?: firebase.firestore.GetOptions
-  ): Promise<firebase.firestore.DocumentSnapshot<DDoc>> {
+  ): Promise<firebase.firestore.DocumentSnapshot<DocumentProps<D>>> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.dImpl.get(options) as any;
   }
@@ -46,7 +41,9 @@ export class DocumentReference<
       const data = doc.data();
       if (data === undefined) return undefined;
 
-      const decoded = this.decoder ? this.decoder(data as DDoc) : data;
+      const decoded = this.decoder
+        ? this.decoder(data as DocumentProps<D>)
+        : data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return { _id: doc.id, ...data, ...decoded } as any;
     });
