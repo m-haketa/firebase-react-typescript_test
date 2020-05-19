@@ -157,8 +157,8 @@ describe('[query fetch]', () => {
     const sortedTestData = testData.sort(sortValue);
 
     expect(data.length).toBe(sortedTestData.length);
-    const zipped = R.zip(sortedData, sortedTestData);
 
+    const zipped = R.zip(sortedData, sortedTestData);
     zipped.map(([d, td]) =>
       expect(d).toEqual({
         name: td.name,
@@ -196,8 +196,8 @@ describe('[query orderBy]', () => {
     const sortedTestData = testData.sort(sortValue);
 
     expect(data.length).toBe(sortedTestData.length);
-    const zipped = R.zip(data, sortedTestData);
 
+    const zipped = R.zip(data, sortedTestData);
     zipped.map(([d, td]) =>
       expect(d).toEqual({
         name: td.name,
@@ -220,8 +220,8 @@ describe('[query limit]', () => {
     const sortedTestData = testData.sort(sortValue).filter((_, i) => i < 5);
 
     expect(data.length).toBe(sortedTestData.length);
-    const zipped = R.zip(data, sortedTestData);
 
+    const zipped = R.zip(data, sortedTestData);
     zipped.map(([d, td]) =>
       expect(d).toEqual({
         name: td.name,
@@ -248,8 +248,8 @@ describe('[query limitToLast]', () => {
       .reverse();
 
     expect(data.length).toBe(sortedTestData.length);
-    const zipped = R.zip(data, sortedTestData);
 
+    const zipped = R.zip(data, sortedTestData);
     zipped.map(([d, td]) =>
       expect(d).toEqual({
         name: td.name,
@@ -278,8 +278,8 @@ describe('[query startat]', () => {
     const data = await orderedCollection.startAt(doc).fetch();
 
     expect(data.length).toBe(sortedTestData.length);
-    const zipped = R.zip(data, sortedTestData);
 
+    const zipped = R.zip(data, sortedTestData);
     zipped.map(([d, td]) =>
       expect(d).toEqual({
         name: td.name,
@@ -293,8 +293,8 @@ describe('[query startat]', () => {
     const data = await orderedCollection.startAt(50).fetch();
 
     expect(data.length).toBe(sortedTestData.length);
-    const zipped = R.zip(data, sortedTestData);
 
+    const zipped = R.zip(data, sortedTestData);
     zipped.map(([d, td]) =>
       expect(d).toEqual({
         name: td.name,
@@ -313,8 +313,8 @@ describe('[query startat]', () => {
       .fetch();
 
     expect(data.length).toBe(sortedTestData.length);
-    const zipped = R.zip(data, sortedTestData);
 
+    const zipped = R.zip(data, sortedTestData);
     zipped.map(([d, td]) =>
       expect(d).toEqual({
         name: td.name,
@@ -338,8 +338,8 @@ describe('[query withConverter]', () => {
     }));
 
     expect(fetchedData.length).toBe(expected.length);
-    const zipped = R.zip(fetchedData.sort(sortValue), expected.sort(sortValue));
 
+    const zipped = R.zip(fetchedData.sort(sortValue), expected.sort(sortValue));
     zipped.map(([d, td]) =>
       expect(d).toEqual({
         value: td.value,
