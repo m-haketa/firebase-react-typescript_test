@@ -3,11 +3,15 @@ import * as firebase from 'firebase';
 import { CollectionReference } from './CollectionReference';
 import { Collection, DocumentProps, WithId } from './type';
 
-export class DocumentReference<D extends Collection, UDoc = DocumentProps<D>> {
+export class DocumentReference<
+  D extends Collection,
+  DDec = DocumentProps<D>,
+  DEnc = DocumentProps<D>
+> {
   constructor(
     private dImpl: firebase.firestore.DocumentReference,
-    protected decoder?: (dbData: Partial<DocumentProps<D>>) => Partial<UDoc>,
-    protected encoder?: (userData: Partial<UDoc>) => Partial<DocumentProps<D>>
+    protected decoder?: (dbData: Partial<DocumentProps<D>>) => Partial<DDec>,
+    protected encoder?: (userData: Partial<DEnc>) => Partial<DocumentProps<D>>
   ) {}
 
   get firestore(): firebase.firestore.Firestore {
@@ -22,7 +26,7 @@ export class DocumentReference<D extends Collection, UDoc = DocumentProps<D>> {
     return this.dImpl.path;
   }
 
-  isEqual(other: DocumentReference<D, UDoc>): boolean {
+  isEqual(other: DocumentReference<D, DDec, DEnc>): boolean {
     return this.dImpl.isEqual(other.dImpl);
   }
 
@@ -35,7 +39,7 @@ export class DocumentReference<D extends Collection, UDoc = DocumentProps<D>> {
 
   fetch(
     options?: firebase.firestore.GetOptions
-  ): Promise<WithId<UDoc> | undefined> {
+  ): Promise<WithId<DDec> | undefined> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.dImpl.get(options).then((doc) => {
       const data = doc.data();
@@ -57,19 +61,19 @@ export class DocumentReference<D extends Collection, UDoc = DocumentProps<D>> {
     );
   }
 
-  set(data: UDoc, options?: firebase.firestore.SetOptions): Promise<void> {
+  set(data: DEnc, options?: firebase.firestore.SetOptions): Promise<void> {
     const converted = this.encoder ? { ...data, ...this.encoder(data) } : data;
     return this.dImpl.set(converted, options);
   }
 
-  update(data: Partial<UDoc>): Promise<void> {
+  update(data: Partial<DEnc>): Promise<void> {
     const converted = this.encoder ? { ...data, ...this.encoder(data) } : data;
     return this.dImpl.update(converted);
   }
 
   /* とりあえず、対応しない
   update(
-    field: keyof UDoc,
+    field: keyof DDec,
     value: any,
     ...moreFieldsAndValues: any[]
   ): Promise<void>;

@@ -13,12 +13,13 @@ import type {
 
 export class CollectionReference<
   D extends Collection,
-  UDoc = DocumentProps<D>
-> extends Query<D, UDoc> {
+  DDec = DocumentProps<D>,
+  DEnc = DocumentProps<D>
+> extends Query<D, DDec, DEnc> {
   constructor(
     private cImpl: firebase.firestore.CollectionReference,
-    decoder?: (dbData: Partial<DocumentProps<D>>) => Partial<UDoc>,
-    encoder?: (userData: Partial<UDoc>) => Partial<DocumentProps<D>>
+    decoder?: (dbData: Partial<DocumentProps<D>>) => Partial<DDec>,
+    encoder?: (userData: Partial<DEnc>) => Partial<DocumentProps<D>>
   ) {
     super(cImpl, decoder, encoder);
   }
@@ -31,19 +32,19 @@ export class CollectionReference<
     return this.cImpl.path;
   }
 
-  isEqual(other: CollectionReference<D, UDoc>): boolean {
+  isEqual(other: CollectionReference<D, DDec, DEnc>): boolean {
     return this.cImpl.isEqual(other.cImpl);
   }
 
-  doc(documentPath?: string): DocumentReference<D, UDoc> {
-    return new DocumentReference<D, UDoc>(
+  doc(documentPath?: string): DocumentReference<D, DDec, DEnc> {
+    return new DocumentReference<D, DDec, DEnc>(
       this.cImpl.doc(documentPath),
       this.decoder,
       this.encoder
     );
   }
 
-  add(data: UDoc): Promise<DocumentReference<D, UDoc>> {
+  add(data: DDec): Promise<DocumentReference<D, DDec, DEnc>> {
     const converted = this.encoder ? { ...data, ...this.encoder(data) } : data;
     return this.cImpl.add(converted).then((dImplRet) => {
       return new DocumentReference(dImplRet, this.decoder, this.encoder);
@@ -54,8 +55,16 @@ export class CollectionReference<
   withConverter<V extends object>(
     decoder: Decoder<DocumentProps<D>, V>,
     encoder: Encoder<DocumentProps<D>, V>
-  ): CollectionReference<D, Substitute<DocumentProps<D>, V>> {
-    return new CollectionReference<D, Substitute<DocumentProps<D>, V>>(
+  ): CollectionReference<
+    D,
+    Substitute<DocumentProps<D>, V>,
+    Substitute<DocumentProps<D>, V>
+  > {
+    return new CollectionReference<
+      D,
+      Substitute<DocumentProps<D>, V>,
+      Substitute<DocumentProps<D>, V>
+    >(
       this.cImpl,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       decoder as any,
