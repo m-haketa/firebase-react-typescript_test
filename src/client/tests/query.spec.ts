@@ -329,6 +329,30 @@ describe('[query startat]', () => {
       })
     );
   });
+
+  test(`startat value object`, async () => {
+    const data = await firestore
+      .collection('data')
+      .orderBy('value', 'asc')
+      .startAt({ value: 50 })
+      .fetch();
+
+    console.log(data);
+
+    const sortedTestData = testData
+      .filter((v) => v.value >= 50)
+      .sort(sortValue);
+
+    //dataの件数分（＝5件）zipする
+    const zipped = R.zip(data, sortedTestData);
+    zipped.map(([d, td]) =>
+      expect(d).toEqual({
+        name: td.name,
+        value: td.value,
+        _id: expect.anything(),
+      })
+    );
+  });
 });
 
 describe('[query withConverter]', () => {
