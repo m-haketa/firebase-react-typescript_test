@@ -156,7 +156,9 @@ describe('[query fetch]', () => {
     const sortedData = data.sort(sortValue);
     const sortedTestData = testData.sort(sortValue);
 
+    expect(data.length).toBe(sortedTestData.length);
     const zipped = R.zip(sortedData, sortedTestData);
+
     zipped.map(([d, td]) =>
       expect(d).toEqual({
         name: td.name,
@@ -193,7 +195,9 @@ describe('[query orderBy]', () => {
 
     const sortedTestData = testData.sort(sortValue);
 
+    expect(data.length).toBe(sortedTestData.length);
     const zipped = R.zip(data, sortedTestData);
+
     zipped.map(([d, td]) =>
       expect(d).toEqual({
         name: td.name,
@@ -212,10 +216,12 @@ describe('[query limit]', () => {
       .limit(5)
       .fetch();
 
-    const sortedTestData = testData.sort(sortValue);
+    //dataはascでsortしたものの最初の5件
+    const sortedTestData = testData.sort(sortValue).filter((_, i) => i < 5);
 
-    //dataの件数分（＝5件）zipする
+    expect(data.length).toBe(sortedTestData.length);
     const zipped = R.zip(data, sortedTestData);
+
     zipped.map(([d, td]) =>
       expect(d).toEqual({
         name: td.name,
@@ -234,14 +240,15 @@ describe('[query limitToLast]', () => {
       .limitToLast(5)
       .fetch();
 
-    //dataはascでsort後最後の5件。それを逆順にする
-    const sortedData = data.reverse();
+    //dataはascでsort後最後の5件。逆順にして5件を抽出する
+    const sortedData = data.reverse().filter((_, i) => i < 5);
 
     //testDataもascでsort後逆順にする。これで、先頭5件は一致するはず
     const sortedTestData = testData.sort(sortValue).reverse();
 
     //sortedDataの件数分（＝5件）zipする
     const zipped = R.zip(sortedData, sortedTestData);
+
     zipped.map(([d, td]) =>
       expect(d).toEqual({
         name: td.name,
@@ -253,6 +260,12 @@ describe('[query limitToLast]', () => {
 });
 
 describe('[query startat]', () => {
+  const sortedTestData = testData.filter((v) => v.value >= 50).sort(sortValue);
+
+  const orderedCollection = firestore
+    .collection('data')
+    .orderBy('value', 'asc');
+
   test(`startat snapshot`, async () => {
     const snapshot = await firestore
       .collection('data')
@@ -261,21 +274,11 @@ describe('[query startat]', () => {
 
     //基準となるドキュメント（valueが50のもの）
     const doc = snapshot.docs[0];
+    const data = await orderedCollection.startAt(doc).fetch();
 
-    const data = await firestore
-      .collection('data')
-      .orderBy('value', 'asc')
-      .startAt(doc)
-      .fetch();
-
-    console.log(data);
-
-    const sortedTestData = testData
-      .filter((v) => v.value >= 50)
-      .sort(sortValue);
-
-    //dataの件数分（＝5件）zipする
+    expect(data.length).toBe(sortedTestData.length);
     const zipped = R.zip(data, sortedTestData);
+
     zipped.map(([d, td]) =>
       expect(d).toEqual({
         name: td.name,
@@ -286,68 +289,11 @@ describe('[query startat]', () => {
   });
 
   test(`startat value`, async () => {
-    const data = await firestore
-      .collection('data')
-      .orderBy('value', 'asc')
-      .startAt(50)
-      .fetch();
+    const data = await orderedCollection.startAt(50).fetch();
 
-    console.log(data);
-
-    const sortedTestData = testData
-      .filter((v) => v.value >= 50)
-      .sort(sortValue);
-
-    //dataの件数分（＝5件）zipする
+    expect(data.length).toBe(sortedTestData.length);
     const zipped = R.zip(data, sortedTestData);
-    zipped.map(([d, td]) =>
-      expect(d).toEqual({
-        name: td.name,
-        value: td.value,
-        _id: expect.anything(),
-      })
-    );
-  });
 
-  test(`startat value array`, async () => {
-    const data = await firestore
-      .collection('data')
-      .orderBy('value', 'asc')
-      .startAt([50])
-      .fetch();
-
-    console.log(data);
-
-    const sortedTestData = testData
-      .filter((v) => v.value >= 50)
-      .sort(sortValue);
-
-    //dataの件数分（＝5件）zipする
-    const zipped = R.zip(data, sortedTestData);
-    zipped.map(([d, td]) =>
-      expect(d).toEqual({
-        name: td.name,
-        value: td.value,
-        _id: expect.anything(),
-      })
-    );
-  });
-
-  test(`startat value object`, async () => {
-    const data = await firestore
-      .collection('data')
-      .orderBy('value', 'asc')
-      .startAt({ value: 1 })
-      .fetch();
-
-    console.log(data);
-
-    const sortedTestData = testData
-      .filter((v) => v.value >= 50)
-      .sort(sortValue);
-
-    //dataの件数分（＝5件）zipする
-    const zipped = R.zip(data, sortedTestData);
     zipped.map(([d, td]) =>
       expect(d).toEqual({
         name: td.name,
@@ -362,17 +308,12 @@ describe('[query startat]', () => {
       .collection('data')
       .orderBy('value', 'asc')
       .orderBy('name')
-      .startAt({ value: 50, name: '1' })
+      .startAt(50, '1')
       .fetch();
 
-    console.log(data);
-
-    const sortedTestData = testData
-      .filter((v) => v.value >= 50)
-      .sort(sortValue);
-
-    //dataの件数分（＝5件）zipする
+    expect(data.length).toBe(sortedTestData.length);
     const zipped = R.zip(data, sortedTestData);
+
     zipped.map(([d, td]) =>
       expect(d).toEqual({
         name: td.name,
@@ -395,6 +336,7 @@ describe('[query withConverter]', () => {
       ...timestampDecoder(data),
     }));
 
+    expect(fetchedData.length).toBe(expected.length);
     const zipped = R.zip(fetchedData.sort(sortValue), expected.sort(sortValue));
 
     zipped.map(([d, td]) =>
