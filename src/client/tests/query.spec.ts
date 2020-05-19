@@ -29,6 +29,13 @@ const schema /* :DatabaseType */ = {
       },
     },
   },
+  data2: {
+    _documents: {
+      value: 'aaa',
+      timestamp: st('2020-05-10'),
+    },
+    _collections: {},
+  },
 };
 type Schema = typeof schema;
 
@@ -48,7 +55,16 @@ const testData: DocumentProps<Schema['data']>[] = [
   { name: 'bcd', value: 15 },
 ];
 
-const testData2: DocumentProps<
+const testData2: DocumentProps<Schema['data2']>[] = [
+  { value: 'AAA', timestamp: st('2020-05-10') },
+  { value: 'BBB', timestamp: st('2020-05-11') },
+  { value: 'CCC', timestamp: st('2020-05-12') },
+  { value: 'DDD', timestamp: st('2020-05-13') },
+  { value: 'EEE', timestamp: st('2020-05-14') },
+  { value: 'FFF', timestamp: st('2020-05-15') },
+];
+
+const testData1_1: DocumentProps<
   CollectionProps<Schema['data']>['subdata']
 >[][] = [
   [
@@ -93,7 +109,7 @@ const testData2: DocumentProps<
   ],
 ];
 
-const sortValue = (a: { value: number }, b: { value: number }): number =>
+const sortValue = <T>(a: { value: T }, b: { value: T }): number =>
   a.value > b.value ? 1 : a.value === b.value ? 0 : -1;
 
 beforeAll(async () => {
@@ -104,10 +120,15 @@ beforeAll(async () => {
     docIds.push(doc.id);
   });
 
-  const docIdAndDatas = R.zip(docIds, testData2);
+  const docIdAndDatas = R.zip(docIds, testData1_1);
   docIdAndDatas.map(([docId, datas]) => {
     const subCol = col.doc(docId).collection('subdata');
     datas.forEach((data) => subCol.add(data));
+  });
+
+  const col2 = firestore.collection('data2');
+  testData2.forEach(async (data) => {
+    const doc2 = await col2.add(data);
   });
 });
 
@@ -237,28 +258,21 @@ describe('[query limitToLast]', () => {
 
 describe('[query withConverter]', () => {
   test(`withConverter`, async () => {
-    const baseDoc = await firestore
-      .collection('data')
-      .where('name', '==', 'abc')
-      .fetch();
-
     const fetchedData = await firestore
-      .collection('data')
-      .doc(baseDoc[0]._id)
-      .collection('subdata')
+      .collection('data2')
       .withConverter(timestampDecoder, timestampEncoder)
       .fetch();
 
-    const expectedData = [
-      { name: 'AAA', timestamp: '2020-05-10' },
-      { name: 'BBB', timestamp: '2020-05-11' },
-    ];
+    const expected = testData2.map((data) => ({
+      ...data,
+      ...timestampDecoder(data),
+    }));
 
-    //sortedDataの件数分（＝5件）zipする
-    const zipped = R.zip(fetchedData, expectedData);
+    const zipped = R.zip(fetchedData.sort(sortValue), expected.sort(sortValue));
+
     zipped.map(([d, td]) =>
       expect(d).toEqual({
-        name: td.name,
+        value: td.value,
         timestamp: td.timestamp,
         _id: expect.anything(),
       })
