@@ -115,6 +115,17 @@ const testData1_1: DocumentProps<
 const sortValue = <T>(a: { value: T }, b: { value: T }): number =>
   a.value > b.value ? 1 : a.value === b.value ? 0 : -1;
 
+const actVsExpAndIdCheck = <T extends S & { _id: string }, S>(
+  expect: jest.Expect,
+  actArr: T[],
+  expArr: S[]
+): void => {
+  expect(actArr.length).toBe(expArr.length);
+
+  const zipped = R.zip(actArr, expArr);
+  zipped.map(([d, td]) => expect(d).toEqual({ ...td, _id: expect.anything() }));
+};
+
 beforeAll(async () => {
   const col = firestore.collection('data');
   const docIds: string[] = [];
@@ -156,16 +167,7 @@ describe('[query fetch]', () => {
     const sortedData = data.sort(sortValue);
     const sortedTestData = testData.sort(sortValue);
 
-    expect(data.length).toBe(sortedTestData.length);
-
-    const zipped = R.zip(sortedData, sortedTestData);
-    zipped.map(([d, td]) =>
-      expect(d).toEqual({
-        name: td.name,
-        value: td.value,
-        _id: expect.anything(),
-      })
-    );
+    actVsExpAndIdCheck(expect, sortedData, sortedTestData);
   });
 });
 
@@ -195,16 +197,7 @@ describe('[query orderBy]', () => {
 
     const sortedTestData = testData.sort(sortValue);
 
-    expect(data.length).toBe(sortedTestData.length);
-
-    const zipped = R.zip(data, sortedTestData);
-    zipped.map(([d, td]) =>
-      expect(d).toEqual({
-        name: td.name,
-        value: td.value,
-        _id: expect.anything(),
-      })
-    );
+    actVsExpAndIdCheck(expect, data, sortedTestData);
   });
 });
 
@@ -219,16 +212,7 @@ describe('[query limit]', () => {
     //dataはascでsortしたものの最初の5件
     const sortedTestData = testData.sort(sortValue).filter((_, i) => i < 5);
 
-    expect(data.length).toBe(sortedTestData.length);
-
-    const zipped = R.zip(data, sortedTestData);
-    zipped.map(([d, td]) =>
-      expect(d).toEqual({
-        name: td.name,
-        value: td.value,
-        _id: expect.anything(),
-      })
-    );
+    actVsExpAndIdCheck(expect, data, sortedTestData);
   });
 });
 
@@ -247,16 +231,7 @@ describe('[query limitToLast]', () => {
       .filter((_, i) => i < 5)
       .reverse();
 
-    expect(data.length).toBe(sortedTestData.length);
-
-    const zipped = R.zip(data, sortedTestData);
-    zipped.map(([d, td]) =>
-      expect(d).toEqual({
-        name: td.name,
-        value: td.value,
-        _id: expect.anything(),
-      })
-    );
+    actVsExpAndIdCheck(expect, data, sortedTestData);
   });
 });
 
@@ -277,31 +252,13 @@ describe('[query startat]', () => {
     const doc = snapshot.docs[0];
     const data = await orderedCollection.startAt(doc).fetch();
 
-    expect(data.length).toBe(sortedTestData.length);
-
-    const zipped = R.zip(data, sortedTestData);
-    zipped.map(([d, td]) =>
-      expect(d).toEqual({
-        name: td.name,
-        value: td.value,
-        _id: expect.anything(),
-      })
-    );
+    actVsExpAndIdCheck(expect, data, sortedTestData);
   });
 
   test(`startat value`, async () => {
     const data = await orderedCollection.startAt(50).fetch();
 
-    expect(data.length).toBe(sortedTestData.length);
-
-    const zipped = R.zip(data, sortedTestData);
-    zipped.map(([d, td]) =>
-      expect(d).toEqual({
-        name: td.name,
-        value: td.value,
-        _id: expect.anything(),
-      })
-    );
+    actVsExpAndIdCheck(expect, data, sortedTestData);
   });
 
   test(`startat value object2`, async () => {
@@ -312,16 +269,7 @@ describe('[query startat]', () => {
       .startAt(50, '1')
       .fetch();
 
-    expect(data.length).toBe(sortedTestData.length);
-
-    const zipped = R.zip(data, sortedTestData);
-    zipped.map(([d, td]) =>
-      expect(d).toEqual({
-        name: td.name,
-        value: td.value,
-        _id: expect.anything(),
-      })
-    );
+    actVsExpAndIdCheck(expect, data, sortedTestData);
   });
 });
 
@@ -332,20 +280,17 @@ describe('[query withConverter]', () => {
       .withConverter(timestampDecoder, timestampEncoder)
       .fetch();
 
-    const expected = testData2.map((data) => ({
+    const expected = testData2.map(({ timestamp, ...data }) => ({
       ...data,
-      ...timestampDecoder(data),
+      timestamp: '', // timestamDecoderの型がtimestampはundefinedになっているため
+      ...timestampDecoder({ timestamp }),
     }));
 
-    expect(fetchedData.length).toBe(expected.length);
-
-    const zipped = R.zip(fetchedData.sort(sortValue), expected.sort(sortValue));
-    zipped.map(([d, td]) =>
-      expect(d).toEqual({
-        value: td.value,
-        timestamp: td.timestamp,
-        _id: expect.anything(),
-      })
+    actVsExpAndIdCheck(
+      expect,
+      fetchedData.sort(sortValue),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expected.sort(sortValue)
     );
   });
 });
