@@ -5,16 +5,6 @@ import type { UserCredential } from '../useFirebaseInit';
 
 import { useRestaurantSnapshot } from '../useRestaurantSnapshot';
 
-export interface Restaurant {
-  avgRating: number;
-  category: string;
-  city: string;
-  name: string;
-  numRatings: number;
-  photo: string;
-  price: number;
-}
-
 export interface IndexProps {
   user: UserCredential | undefined;
 }

@@ -5,22 +5,14 @@ import * as firebase from 'firebase';
 import { firestore } from './firestoreWrapper/Firestore';
 import { Database } from './schema';
 
-import type { WithId } from './firestoreWrapper/type';
+import { WithId, DocumentProps as DP } from './firestoreWrapper/type';
 
-export interface Restaurant {
-  avgRating: number;
-  category: string;
-  city: string;
-  name: string;
-  numRatings: number;
-  photo: string;
-  price: number;
-}
+export type Restaurant = WithId<DP<Database['restaurants']>>;
 
 export const useRestaurantSnapshot = (
   user: firebase.auth.UserCredential | undefined
-): [WithId<Restaurant>[]] => {
-  const [data, setData] = useState<WithId<Restaurant>[]>([]);
+): [Restaurant[]] => {
+  const [data, setData] = useState<Restaurant[]>([]);
 
   useEffect(() => {
     if (user === undefined) return;

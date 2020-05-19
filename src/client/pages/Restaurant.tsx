@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { Restaurant as RestaurantType } from './Index';
+import { Restaurant as RestaurantType } from '../useRestaurantSnapshot';
 import type { UserCredential } from '../useFirebaseInit';
 
 import { firestore } from '../firestoreWrapper/Firestore';
