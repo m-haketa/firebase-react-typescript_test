@@ -30,7 +30,7 @@ export type Database = {
   };
 };
 
-export const timestampToString = (timestamp: Timestamp): string =>
+export const timestampToYMDString = (timestamp: Timestamp): string =>
   format('yyyy-MM-dd')(timestamp.toDate());
 
 export const stringToTimestamp = (stringDate: string): Timestamp =>
@@ -40,7 +40,7 @@ export const timestampDecoder: Decoder<
   { timestamp: Timestamp },
   { timestamp: string }
 > = ({ timestamp }) => ({
-  timestamp: timestampToString(timestamp),
+  timestamp: timestampToYMDString(timestamp),
 });
 
 export const timestampEncoder: Encoder<
