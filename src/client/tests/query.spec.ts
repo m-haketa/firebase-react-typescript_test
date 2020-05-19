@@ -143,7 +143,6 @@ describe('[query get]', () => {
       const data = doc.data();
       return { name: data.name, value: data.value };
     });
-    console.log(data);
     expect(data).toEqual(expect.arrayContaining(testData));
   });
 });
@@ -151,8 +150,6 @@ describe('[query get]', () => {
 describe('[query fetch]', () => {
   test(`fetch`, async () => {
     const data = await firestore.collection('data').fetch();
-    console.log(data);
-
     const sortedData = data.sort(sortValue);
     const sortedTestData = testData.sort(sortValue);
 
@@ -173,7 +170,6 @@ describe('[query where]', () => {
       .collection('data')
       .where('value', '==', 80)
       .fetch();
-    console.log(data);
 
     expect(data).toEqual([
       {
@@ -191,7 +187,6 @@ describe('[query orderBy]', () => {
       .collection('data')
       .orderBy('value', 'asc')
       .fetch();
-    console.log(data);
 
     const sortedTestData = testData.sort(sortValue);
 
@@ -213,7 +208,6 @@ describe('[query limit]', () => {
       .orderBy('value', 'asc')
       .limit(5)
       .fetch();
-    console.log(data);
 
     const sortedTestData = testData.sort(sortValue);
 
@@ -236,7 +230,6 @@ describe('[query limitToLast]', () => {
       .orderBy('value', 'asc')
       .limitToLast(5)
       .fetch();
-    console.log(data);
 
     //dataはascでsort後最後の5件。それを逆順にする
     const sortedData = data.reverse();
