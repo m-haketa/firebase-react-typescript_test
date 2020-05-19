@@ -7,25 +7,20 @@ import type { UserCredential } from '../useFirebaseInit';
 import { firestore } from '../firestoreWrapper/Firestore';
 import { Database, timestampDecoder } from '../schema';
 
-export interface RestaurantRating {
-  rating: number;
-  text: string;
-  timestamp: string;
-  userId: string;
-  userName: string;
-}
-
-export interface RestaurantRatingRet {
-  rating: number;
-  text: string;
-  timestamp: Date;
-  userId: string;
-  userName: string;
-}
+import {
+  WithId,
+  SubCollectionProps as SCP,
+  DocumentProps as DP,
+  Substitute as ST,
+} from '../firestoreWrapper/type';
 
 interface RestaurantProps {
   user: UserCredential | undefined;
 }
+
+type RestaurantRating = WithId<
+  ST<DP<SCP<Database['restaurants']>['ratings']>, { timestamp: string }>
+>;
 
 export const Restaurant: React.FC<RestaurantProps> = ({ user }) => {
   const { restaurant_id } = useParams();
@@ -82,10 +77,10 @@ export const Restaurant: React.FC<RestaurantProps> = ({ user }) => {
           ratings:
           <br />
           {ratings.map((rating) => (
-            <>
+            <div key={rating._id}>
               {rating.userName},{rating.rating},{rating.text},{rating.timestamp}
               <br />
-            </>
+            </div>
           ))}
         </>
       )}
