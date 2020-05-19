@@ -240,14 +240,15 @@ describe('[query limitToLast]', () => {
       .limitToLast(5)
       .fetch();
 
-    //dataはascでsort後最後の5件。逆順にして5件を抽出する
-    const sortedData = data.reverse().filter((_, i) => i < 5);
-
     //testDataもascでsort後逆順にする。これで、先頭5件は一致するはず
-    const sortedTestData = testData.sort(sortValue).reverse();
+    const sortedTestData = testData
+      .sort(sortValue)
+      .reverse()
+      .filter((_, i) => i < 5)
+      .reverse();
 
-    //sortedDataの件数分（＝5件）zipする
-    const zipped = R.zip(sortedData, sortedTestData);
+    expect(data.length).toBe(sortedTestData.length);
+    const zipped = R.zip(data, sortedTestData);
 
     zipped.map(([d, td]) =>
       expect(d).toEqual({
