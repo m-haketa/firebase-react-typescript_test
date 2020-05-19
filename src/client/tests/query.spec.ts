@@ -249,6 +249,88 @@ describe('[query limitToLast]', () => {
   });
 });
 
+describe('[query startat]', () => {
+  test(`startat snapshot`, async () => {
+    const snapshot = await firestore
+      .collection('data')
+      .where('value', '==', 50)
+      .get();
+
+    //基準となるドキュメント（valueが50のもの）
+    const doc = snapshot.docs[0];
+
+    const data = await firestore
+      .collection('data')
+      .orderBy('value', 'asc')
+      .startAt(doc)
+      .fetch();
+
+    console.log(data);
+
+    const sortedTestData = testData
+      .filter((v) => v.value >= 50)
+      .sort(sortValue);
+
+    //dataの件数分（＝5件）zipする
+    const zipped = R.zip(data, sortedTestData);
+    zipped.map(([d, td]) =>
+      expect(d).toEqual({
+        name: td.name,
+        value: td.value,
+        _id: expect.anything(),
+      })
+    );
+  });
+
+  test(`startat value`, async () => {
+    const data = await firestore
+      .collection('data')
+      .orderBy('value', 'asc')
+      .startAt(50)
+      .fetch();
+
+    console.log(data);
+
+    const sortedTestData = testData
+      .filter((v) => v.value >= 50)
+      .sort(sortValue);
+
+    //dataの件数分（＝5件）zipする
+    const zipped = R.zip(data, sortedTestData);
+    zipped.map(([d, td]) =>
+      expect(d).toEqual({
+        name: td.name,
+        value: td.value,
+        _id: expect.anything(),
+      })
+    );
+  });
+
+  test(`startat value array`, async () => {
+    const data = await firestore
+      .collection('data')
+      .orderBy('value', 'asc')
+      .startAt([50])
+      .fetch();
+
+    console.log(data);
+
+    const sortedTestData = testData
+      .filter((v) => v.value >= 50)
+      .sort(sortValue);
+
+    //dataの件数分（＝5件）zipする
+    const zipped = R.zip(data, sortedTestData);
+    zipped.map(([d, td]) =>
+      expect(d).toEqual({
+        name: td.name,
+        value: td.value,
+        _id: expect.anything(),
+      })
+    );
+  });
+});
+
 describe('[query withConverter]', () => {
   test(`withConverter`, async () => {
     const fetchedData = await firestore
