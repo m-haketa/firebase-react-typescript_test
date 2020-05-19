@@ -25,13 +25,15 @@ export const useRestaurantSnapshot = (
   useEffect(() => {
     if (user === undefined) return;
 
-    firestore<Database>()
+    const cancelSnapshot = firestore<Database>()
       .collection('restaurants')
       .orderBy('avgRating', 'desc')
       .limit(5)
       .fetchSnapshot((snapshotData) => {
         setData(snapshotData);
       });
+
+    return cancelSnapshot;
   }, [user]);
 
   return [data];
