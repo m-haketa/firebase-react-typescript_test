@@ -75,12 +75,10 @@ export class Query<
   }
 
   startAt(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    snapshot: firebase.firestore.DocumentSnapshot<any>
+    snapshot: firebase.firestore.DocumentSnapshot<unknown>
   ): Query<D, UDoc, Order>;
   startAt(...params: TupleStyle<Order>): Query<D, UDoc, Order>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  startAt(...params: any[]): Query<D, UDoc, Order> {
+  startAt(...params: unknown[]): Query<D, UDoc, Order> {
     //if (params[0] instanceof firebase.firestore.DocumentSnapshot) {
     //  //snapshotオブジェクトの場合
     //  return new Query<D, UDoc, Order>(this.qImpl.startAt(...params));
@@ -89,39 +87,27 @@ export class Query<
     return new Query<D, UDoc, Order>(this.qImpl.startAt(...params));
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   startAfter(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    snapshot: firebase.firestore.DocumentSnapshot<any>
+    snapshot: firebase.firestore.DocumentSnapshot<unknown>
   ): Query<D, UDoc, Order>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  startAfter(...fieldValues: any[]): Query<D, UDoc, Order>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  startAfter(...params: any[]): Query<D, UDoc, Order> {
+  startAfter(...params: TupleStyle<Order>): Query<D, UDoc, Order>;
+  startAfter(...params: unknown[]): Query<D, UDoc, Order> {
     return new Query<D, UDoc, Order>(this.qImpl.startAfter(...params));
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   endBefore(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    snapshot: firebase.firestore.DocumentSnapshot<any>
+    snapshot: firebase.firestore.DocumentSnapshot<unknown>
   ): Query<D, UDoc, Order>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  endBefore(...fieldValues: any[]): Query<D, UDoc, Order>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  endBefore(...params: any[]): Query<D, UDoc, Order> {
+  endBefore(...params: TupleStyle<Order>): Query<D, UDoc, Order>;
+  endBefore(...params: unknown[]): Query<D, UDoc, Order> {
     return new Query<D, UDoc, Order>(this.qImpl.endBefore(...params));
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   endAt(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    snapshot: firebase.firestore.DocumentSnapshot<any>
+    snapshot: firebase.firestore.DocumentSnapshot<unknown>
   ): Query<D, UDoc, Order>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  endAt(...fieldValues: any[]): Query<D, UDoc, Order>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  endAt(...params: any[]): Query<D, UDoc, Order> {
+  endAt(...params: TupleStyle<Order>): Query<D, UDoc, Order>;
+  endAt(...params: unknown[]): Query<D, UDoc, Order> {
     return new Query<D, UDoc, Order>(this.qImpl.endAt(...params));
   }
 
