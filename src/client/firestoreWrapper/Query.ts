@@ -153,10 +153,10 @@ export class Query<
     return this.qImpl.onSnapshot(param1, ...params);
   }
 
-  fetchSnapshot(callback: (arrData: WithId<UDoc>[]) => void): void {
+  fetchSnapshot(callback: (arrData: WithId<UDoc>[]) => void): () => void {
     let retArr: WithId<UDoc>[] = [];
 
-    this.onSnapshot((snapshot) => {
+    return this.onSnapshot((snapshot) => {
       if (!snapshot.size) {
         retArr = [];
       } else {
