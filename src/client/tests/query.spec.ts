@@ -261,12 +261,12 @@ describe('[query startat]', () => {
     actVsExpAndIdCheck(expect, data, sortedTestData);
   });
 
-  test(`startat value object2`, async () => {
+  test(`startat value object`, async () => {
     const data = await firestore
       .collection('data')
       .orderBy('value', 'asc')
       .orderBy('name')
-      .startAt(50, '1')
+      .startAt(50, 'jkl')
       .fetch();
 
     actVsExpAndIdCheck(expect, data, sortedTestData);
