@@ -6,12 +6,10 @@ import type { DatabaseType } from './type';
 class Firestore<D extends DatabaseType = DatabaseType> {
   constructor(private impl: firebase.firestore.Firestore) {}
 
-  collection(
-    collectionPath: string & keyof D
-  ): CollectionReference<D[typeof collectionPath]> {
-    return new CollectionReference<D[typeof collectionPath]>(
-      this.impl.collection(collectionPath)
-    );
+  collection<K extends keyof D>(
+    collectionPath: string & K
+  ): CollectionReference<D[K]> {
+    return new CollectionReference<D[K]>(this.impl.collection(collectionPath));
   }
 
   enableNetwork(): Promise<void> {

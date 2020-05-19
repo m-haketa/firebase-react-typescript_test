@@ -52,10 +52,10 @@ export class DocumentReference<
     });
   }
 
-  collection(
-    collectionPath: string & keyof DCol
-  ): CollectionReference<D['_collections'][typeof collectionPath]> {
-    return new CollectionReference<D['_collections'][typeof collectionPath]>(
+  collection<K extends keyof D['_collections']>(
+    collectionPath: string & K
+  ): CollectionReference<D['_collections'][K]> {
+    return new CollectionReference<D['_collections'][K]>(
       this.dImpl.collection(collectionPath)
     );
   }
