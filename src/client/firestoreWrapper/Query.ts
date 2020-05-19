@@ -7,9 +7,17 @@ import type {
   Substitute,
   Decoder,
   Encoder,
+  Push,
+  TupleStyle,
+  ObjectStyle,
 } from './type';
 
-export class Query<D extends Collection, UDoc = DocumentProps<D>> {
+export class Query<
+  D extends Collection,
+  UDoc = DocumentProps<D>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Order extends { [key: string]: any }[] = []
+> {
   constructor(
     private qImpl: firebase.firestore.Query,
     protected decoder?: (dbData: Partial<DocumentProps<D>>) => Partial<UDoc>,
@@ -42,78 +50,85 @@ export class Query<D extends Collection, UDoc = DocumentProps<D>> {
     });
   }
 
-  where<T extends keyof DocumentProps<D>>(
-    fieldPath: (T & string) | firebase.firestore.FieldPath,
+  where<K extends keyof DocumentProps<D>>(
+    fieldPath: (K & string) | firebase.firestore.FieldPath,
     opStr: firebase.firestore.WhereFilterOp,
-    value: DocumentProps<D>[T]
-  ): Query<D, UDoc> {
-    return new Query<D, UDoc>(this.qImpl.where(fieldPath, opStr, value));
+    value: DocumentProps<D>[K]
+  ): Query<D, UDoc, Order> {
+    return new Query<D, UDoc, Order>(this.qImpl.where(fieldPath, opStr, value));
   }
 
-  orderBy<T extends keyof DocumentProps<D>>(
-    fieldPath: (T & string) | firebase.firestore.FieldPath,
+  orderBy<K extends keyof UDoc>(
+    fieldPath: (K & string) | firebase.firestore.FieldPath,
     directionStr?: firebase.firestore.OrderByDirection
-  ): Query<D, UDoc> {
-    return new Query<D, UDoc>(this.qImpl.orderBy(fieldPath, directionStr));
+  ): Query<D, UDoc, Push<Order, Pick<UDoc, K>>> {
+    return new Query<D, UDoc, Push<Order, Pick<UDoc, K>>>(
+      this.qImpl.orderBy(fieldPath, directionStr)
+    );
   }
 
-  limit(limit: number): Query<D, UDoc> {
-    return new Query<D, UDoc>(this.qImpl.limit(limit));
+  limit(limit: number): Query<D, UDoc, Order> {
+    return new Query<D, UDoc, Order>(this.qImpl.limit(limit));
   }
 
-  limitToLast(limit: number): Query<D, UDoc> {
-    return new Query<D, UDoc>(this.qImpl.limitToLast(limit));
+  limitToLast(limit: number): Query<D, UDoc, Order> {
+    return new Query<D, UDoc, Order>(this.qImpl.limitToLast(limit));
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  startAt(params: ObjectStyle<Order>): Query<D, UDoc, Order>;
+  startAt(params: TupleStyle<Order>): Query<D, UDoc, Order>;
+  startAt(...params: TupleStyle<Order>): Query<D, UDoc, Order>;
   startAt(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     snapshot: firebase.firestore.DocumentSnapshot<any>
-  ): Query<D, UDoc>;
+  ): Query<D, UDoc, Order>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  startAt(...fieldValues: any[]): Query<D, UDoc>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  startAt(...params: any[]): Query<D, UDoc> {
-    return new Query<D, UDoc>(this.qImpl.startAt(...params));
+  startAt(...params: any[]): Query<D, UDoc, Order> {
+    //if (params[0] instanceof firebase.firestore.DocumentSnapshot) {
+    //  //snapshotオブジェクトの場合
+    //  return new Query<D, UDoc, Order>(this.qImpl.startAt(...params));
+    //}
+    //TODO:withConverter使用に伴う引数置換のロジックを入れるならここだが難しすぎるため見送り
+    return new Query<D, UDoc, Order>(this.qImpl.startAt(...params));
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   startAfter(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     snapshot: firebase.firestore.DocumentSnapshot<any>
-  ): Query<D, UDoc>;
+  ): Query<D, UDoc, Order>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  startAfter(...fieldValues: any[]): Query<D, UDoc>;
+  startAfter(...fieldValues: any[]): Query<D, UDoc, Order>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  startAfter(...params: any[]): Query<D, UDoc> {
-    return new Query<D, UDoc>(this.qImpl.startAfter(...params));
+  startAfter(...params: any[]): Query<D, UDoc, Order> {
+    return new Query<D, UDoc, Order>(this.qImpl.startAfter(...params));
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   endBefore(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     snapshot: firebase.firestore.DocumentSnapshot<any>
-  ): Query<D, UDoc>;
+  ): Query<D, UDoc, Order>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  endBefore(...fieldValues: any[]): Query<D, UDoc>;
+  endBefore(...fieldValues: any[]): Query<D, UDoc, Order>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  endBefore(...params: any[]): Query<D, UDoc> {
-    return new Query<D, UDoc>(this.qImpl.endBefore(...params));
+  endBefore(...params: any[]): Query<D, UDoc, Order> {
+    return new Query<D, UDoc, Order>(this.qImpl.endBefore(...params));
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   endAt(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     snapshot: firebase.firestore.DocumentSnapshot<any>
-  ): Query<D, UDoc>;
+  ): Query<D, UDoc, Order>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  endAt(...fieldValues: any[]): Query<D, UDoc>;
+  endAt(...fieldValues: any[]): Query<D, UDoc, Order>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  endAt(...params: any[]): Query<D, UDoc> {
-    return new Query<D, UDoc>(this.qImpl.endAt(...params));
+  endAt(...params: any[]): Query<D, UDoc, Order> {
+    return new Query<D, UDoc, Order>(this.qImpl.endAt(...params));
   }
 
-  isEqual(other: Query<D, UDoc>): boolean {
+  isEqual(other: Query<D, UDoc, Order>): boolean {
     return this.qImpl.isEqual(other.qImpl);
   }
 
@@ -185,11 +200,15 @@ export class Query<D extends Collection, UDoc = DocumentProps<D>> {
   }
 
   //Vは、Dのうち置換したい項目だけ書けばOK
+  //TODO: Query<D, Substitute<DocumentProps<D>, V>, Order>の
+  //OrderをSubstituteObjArr<Order, V>に修正して、
+  //OrderBy指定後のStartAtなどを変換後のパラメータで指定
+  //できるようにしたかったが、あまりに複雑なため、とりあえず見送り
   withConverter<V extends object>(
     decoder: Decoder<DocumentProps<D>, V>,
     encoder: Encoder<DocumentProps<D>, V>
-  ): Query<D, Substitute<DocumentProps<D>, V>> {
-    return new Query<D, Substitute<DocumentProps<D>, V>>(
+  ): Query<D, Substitute<DocumentProps<D>, V>, Order> {
+    return new Query<D, Substitute<DocumentProps<D>, V>, Order>(
       this.qImpl,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       decoder as any,
