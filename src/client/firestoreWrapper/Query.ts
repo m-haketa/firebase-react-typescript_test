@@ -177,30 +177,32 @@ export class Query<
   }
 
   //Vは、Dのうち置換したい項目だけ書けばOK
+  withDecoder<V extends object>(
+    decoder: Decoder<DocumentProps<D>, V>
+  ): Query<D, Substitute<DocumentProps<D>, V>, DEnc, Order> {
+    return new Query<D, Substitute<DocumentProps<D>, V>, DEnc, Order>(
+      this.qImpl,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      decoder as any,
+      this.encoder
+    );
+  }
+
+  //Vは、Dのうち置換したい項目だけ書けばOK
   //TODO: Query<D, Substitute<DocumentProps<D>, V>, Order>の
   //OrderをSubstituteObjArr<Order, V>に修正して、
   //OrderBy指定後のStartAtなどを変換後のパラメータで指定
   //できるようにしたかったが、あまりに複雑なため、とりあえず見送り
-  withConverter<V extends object>(
-    decoder: Decoder<DocumentProps<D>, V>,
+  withEncoder<V extends object>(
     encoder: Encoder<DocumentProps<D>, V>
-  ): Query<
-    D,
-    Substitute<DocumentProps<D>, V>,
-    Substitute<DocumentProps<D>, V>,
-    Order
-  > {
-    return new Query<
-      D,
-      Substitute<DocumentProps<D>, V>,
-      Substitute<DocumentProps<D>, V>,
-      Order
-    >(
+  ): Query<D, DDec, Substitute<DocumentProps<D>, V>, Order> {
+    return new Query<D, DDec, Substitute<DocumentProps<D>, V>, Order>(
       this.qImpl,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      decoder as any,
+      this.decoder,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       encoder as any
     );
   }
+
+  //withConverter<U>(converter: FirestoreDataConverter<U>): Query<U>;
 }

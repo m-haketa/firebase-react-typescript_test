@@ -3,11 +3,7 @@ import { WebFirestoreTestUtil } from './util';
 
 import * as R from 'ramda';
 
-import {
-  stringToTimestamp as st,
-  timestampDecoder,
-  timestampEncoder,
-} from '../schema';
+import { stringToTimestamp as st, timestampDecoder } from '../schema';
 import type {
   DocumentProps,
   SubCollectionProps,
@@ -387,11 +383,11 @@ describe('[query endBefore]', () => {
   });
 });
 
-describe('[query withConverter]', () => {
-  test(`withConverter`, async () => {
+describe('[query withDecoder]', () => {
+  test(`withDecoder`, async () => {
     const fetchedData = await firestore
       .collection('data2')
-      .withConverter(timestampDecoder, timestampEncoder)
+      .withDecoder(timestampDecoder)
       .fetch();
 
     const expected = testData2.map(({ timestamp, ...data }) => ({

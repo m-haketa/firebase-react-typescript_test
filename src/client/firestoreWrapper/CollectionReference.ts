@@ -52,22 +52,28 @@ export class CollectionReference<
   }
 
   //Vは、Dのうち置換したい項目だけ書けばOK
-  withConverter<V extends object>(
-    decoder: Decoder<DocumentProps<D>, V>,
-    encoder: Encoder<DocumentProps<D>, V>
-  ): CollectionReference<
-    D,
-    Substitute<DocumentProps<D>, V>,
-    Substitute<DocumentProps<D>, V>
-  > {
-    return new CollectionReference<
-      D,
-      Substitute<DocumentProps<D>, V>,
-      Substitute<DocumentProps<D>, V>
-    >(
+  withDecoder<V extends object>(
+    decoder: Decoder<DocumentProps<D>, V>
+  ): CollectionReference<D, Substitute<DocumentProps<D>, V>, DEnc> {
+    return new CollectionReference<D, Substitute<DocumentProps<D>, V>, DEnc>(
       this.cImpl,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       decoder as any,
+      this.encoder
+    );
+  }
+
+  //Vは、Dのうち置換したい項目だけ書けばOK
+  //TODO: Query<D, Substitute<DocumentProps<D>, V>, Order>の
+  //OrderをSubstituteObjArr<Order, V>に修正して、
+  //OrderBy指定後のStartAtなどを変換後のパラメータで指定
+  //できるようにしたかったが、あまりに複雑なため、とりあえず見送り
+  withEncoder<V extends object>(
+    encoder: Encoder<DocumentProps<D>, V>
+  ): CollectionReference<D, DDec, Substitute<DocumentProps<D>, V>> {
+    return new CollectionReference<D, DDec, Substitute<DocumentProps<D>, V>>(
+      this.cImpl,
+      this.decoder,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       encoder as any
     );
@@ -75,5 +81,8 @@ export class CollectionReference<
 
   /*
   readonly parent: DocumentReference<DocumentData> | null;
+  withConverter<U>(
+      converter: FirestoreDataConverter<U>
+    ): CollectionReference<U>;
   */
 }

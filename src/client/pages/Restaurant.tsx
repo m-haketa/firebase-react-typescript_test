@@ -5,7 +5,7 @@ import { Restaurant as RestaurantType } from './Index';
 import type { UserCredential } from '../useFirebaseInit';
 
 import { firestore } from '../firestoreWrapper/Firestore';
-import { Database, timestampDecoder, timestampEncoder } from '../schema';
+import { Database, timestampDecoder } from '../schema';
 
 export interface RestaurantRating {
   rating: number;
@@ -59,7 +59,7 @@ export const Restaurant: React.FC<RestaurantProps> = ({ user }) => {
       .collection(`restaurants`)
       .doc(restaurant_id)
       .collection(`ratings`)
-      .withConverter<{ timestamp: string }>(timestampDecoder, timestampEncoder)
+      .withDecoder<{ timestamp: string }>(timestampDecoder)
       .fetch()
       .then((ret) => {
         setRatings(ret);
