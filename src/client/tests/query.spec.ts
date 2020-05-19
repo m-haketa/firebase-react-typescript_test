@@ -131,7 +131,7 @@ beforeAll(async () => {
 
   const col2 = firestore.collection('data2');
   testData2.forEach(async (data) => {
-    const doc2 = await col2.add(data);
+    await col2.add(data);
   });
 });
 
