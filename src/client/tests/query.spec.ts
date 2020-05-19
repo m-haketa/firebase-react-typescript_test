@@ -273,6 +273,44 @@ describe('[query startat]', () => {
   });
 });
 
+describe('[query startafter]', () => {
+  const sortedTestData = testData.filter((v) => v.value > 50).sort(sortValue);
+
+  const orderedCollection = firestore
+    .collection('data')
+    .orderBy('value', 'asc');
+
+  test(`startAfter snapshot`, async () => {
+    const snapshot = await firestore
+      .collection('data')
+      .where('value', '==', 50)
+      .get();
+
+    //基準となるドキュメント（valueが50のもの）
+    const doc = snapshot.docs[0];
+    const data = await orderedCollection.startAfter(doc).fetch();
+
+    actVsExpAndIdCheck(expect, data, sortedTestData);
+  });
+
+  test(`startAfter value`, async () => {
+    const data = await orderedCollection.startAfter(50).fetch();
+
+    actVsExpAndIdCheck(expect, data, sortedTestData);
+  });
+
+  test(`startAfter value object`, async () => {
+    const data = await firestore
+      .collection('data')
+      .orderBy('value', 'asc')
+      .orderBy('name')
+      .startAfter(50, 'jkl')
+      .fetch();
+
+    actVsExpAndIdCheck(expect, data, sortedTestData);
+  });
+});
+
 describe('[query withConverter]', () => {
   test(`withConverter`, async () => {
     const fetchedData = await firestore
