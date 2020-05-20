@@ -398,7 +398,11 @@ describe('[query withDecoder]', () => {
       .collection('data2')
       .withDecoder(({ timestamp, value }) => ({
         timestamp: timestamp.toDate(),
-        value: value,
+        value,
+      }))
+      .withEncoder(({ timestamp, value }) => ({
+        timestamp: Timestamp.fromDate(timestamp),
+        value,
       }))
       .fetch();
 
@@ -440,22 +444,17 @@ describe('[collection add]', () => {
 
     type Col = typeof col;
     const doc = await col
-      .withEncoder<typeof data>(({ timestamp, ...others }) => ({
+      .withDecoder(({ timestamp, value }) => ({
+        timestamp: timestampToYMDString(timestamp),
+        value: value,
+      }))
+      .withEncoder(({ timestamp, ...others }) => ({
         ...others,
         timestamp: Timestamp.fromDate(new Date(timestamp)),
       }))
       .add(data);
 
-    expect(
-      (
-        await doc
-          .withDecoder(({ timestamp, value }) => ({
-            timestamp: timestampToYMDString(timestamp),
-            value: value,
-          }))
-          .get()
-      ).data()
-    ).toEqual(data);
+    expect((await doc.get()).data()).toEqual(data);
   });
 
   test('collection add encode, document fetch decode', async () => {
@@ -468,18 +467,17 @@ describe('[collection add]', () => {
 
     type Col = typeof col;
     const doc = await col
-      .withEncoder<typeof data>(({ timestamp, ...others }) => ({
+      .withDecoder(({ timestamp, value }) => ({
+        timestamp: timestampToYMDString(timestamp),
+        value: value,
+      }))
+      .withEncoder(({ timestamp, ...others }) => ({
         ...others,
         timestamp: Timestamp.fromDate(new Date(timestamp)),
       }))
       .add(data);
 
-    const fetched = await doc
-      .withDecoder(({ timestamp, value }) => ({
-        timestamp: timestampToYMDString(timestamp),
-        value: value,
-      }))
-      .fetch();
+    const fetched = await doc.fetch();
 
     expect(fetched).toEqual({
       ...data,

@@ -62,21 +62,21 @@ export class CollectionReference<
 
   withDecoder<V extends object>(
     fromFirestore: Decoder<DocumentProps<D>, V>
-  ): CollectionReference<D, V, DEnc> {
-    return new CollectionReference<D, V, DEnc>(
+  ): CollectionReference<D, V, V> {
+    return new CollectionReference<D, V, V>(
       this.cImpl,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       fromFirestore as any,
-      this.toFirestore
+      this.toFirestore as any
     );
   }
 
-  withEncoder<V extends object>(
-    toFirestore: Encoder<DocumentProps<D>, V>
-  ): CollectionReference<D, DDec, V> {
-    return new CollectionReference<D, DDec, V>(
+  withEncoder(
+    toFirestore: Encoder<DocumentProps<D>, DEnc>
+  ): CollectionReference<D, DEnc, DEnc> {
+    return new CollectionReference<D, DEnc, DEnc>(
       this.cImpl,
-      this.fromFirestore,
+      this.fromFirestore as any,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       toFirestore as any
     );

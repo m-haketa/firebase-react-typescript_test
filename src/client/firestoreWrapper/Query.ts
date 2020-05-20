@@ -187,21 +187,21 @@ export class Query<
 
   withDecoder<V extends object>(
     fromFirestore: Decoder<DocumentProps<D>, V>
-  ): Query<D, V, DEnc, Order> {
-    return new Query<D, V, DEnc, Order>(
+  ): Query<D, V, V, Order> {
+    return new Query<D, V, V, Order>(
       this.qImpl,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       fromFirestore as any,
-      this.toFirestore
+      this.toFirestore as any
     );
   }
 
-  withEncoder<V extends object>(
-    toFirestore: Encoder<DocumentProps<D>, V>
-  ): Query<D, DDec, V, Order> {
-    return new Query<D, DDec, V, Order>(
+  withEncoder(
+    toFirestore: Encoder<DocumentProps<D>, DEnc>
+  ): Query<D, DEnc, DEnc, Order> {
+    return new Query<D, DEnc, DEnc, Order>(
       this.qImpl,
-      this.fromFirestore,
+      this.fromFirestore as any,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       toFirestore as any
     );

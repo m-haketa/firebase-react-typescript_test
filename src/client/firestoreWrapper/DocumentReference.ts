@@ -117,21 +117,21 @@ export class DocumentReference<
 
   withDecoder<V extends object>(
     fromFirestore: Decoder<DocumentProps<D>, V>
-  ): DocumentReference<D, V, DEnc> {
-    return new DocumentReference<D, V, DEnc>(
+  ): DocumentReference<D, V, V> {
+    return new DocumentReference<D, V, V>(
       this.dImpl,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       fromFirestore as any,
-      this.toFirestore
+      this.toFirestore as any
     );
   }
 
-  withEncoder<V extends object>(
-    toFirestore: Encoder<DocumentProps<D>, V>
-  ): DocumentReference<D, DDec, V> {
-    return new DocumentReference<D, DDec, V>(
+  withEncoder(
+    toFirestore: Encoder<DocumentProps<D>, DEnc>
+  ): DocumentReference<D, DEnc, DEnc> {
+    return new DocumentReference<D, DEnc, DEnc>(
       this.dImpl,
-      this.fromFirestore,
+      this.fromFirestore as any,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       toFirestore as any
     );
