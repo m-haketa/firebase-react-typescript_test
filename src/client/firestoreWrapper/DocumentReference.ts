@@ -10,8 +10,13 @@ export class DocumentReference<
 > {
   constructor(
     private dImpl: firebase.firestore.DocumentReference,
-    protected decoder?: (dbData: Partial<DocumentProps<D>>) => Partial<DDec>,
-    protected encoder?: (userData: Partial<DEnc>) => Partial<DocumentProps<D>>
+    protected fromFirestore: (dbData: DocumentProps<D>) => DDec = (d): DDec =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      d as any,
+    protected toFirestore: (userData: DEnc) => DocumentProps<D> = (
+      d
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ): DocumentProps<D> => d as any
   ) {}
 
   get firestore(): firebase.firestore.Firestore {
@@ -45,8 +50,8 @@ export class DocumentReference<
       const data = doc.data();
       if (data === undefined) return undefined;
 
-      const decoded = this.decoder
-        ? this.decoder(data as DocumentProps<D>)
+      const decoded = this.fromFirestore
+        ? this.fromFirestore(data as DocumentProps<D>)
         : data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return { _id: doc.id, ...data, ...decoded } as any;
@@ -62,12 +67,16 @@ export class DocumentReference<
   }
 
   set(data: DEnc, options?: firebase.firestore.SetOptions): Promise<void> {
-    const converted = this.encoder ? { ...data, ...this.encoder(data) } : data;
+    const converted = this.toFirestore
+      ? { ...data, ...this.toFirestore(data) }
+      : data;
     return this.dImpl.set(converted, options);
   }
 
-  update(data: Partial<DEnc>): Promise<void> {
-    const converted = this.encoder ? { ...data, ...this.encoder(data) } : data;
+  update(data: DEnc): Promise<void> {
+    const converted = this.toFirestore
+      ? { ...data, ...this.toFirestore(data) }
+      : data;
     return this.dImpl.update(converted);
   }
 

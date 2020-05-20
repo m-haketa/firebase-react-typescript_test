@@ -5,7 +5,7 @@ import { Restaurant as RestaurantType } from '../useRestaurantSnapshot';
 import type { UserCredential } from '../useFirebaseInit';
 
 import { firestore } from '../firestoreWrapper/Firestore';
-import { Database, timestampDecoder } from '../schema';
+import { Database, timestampToYMDString } from '../schema';
 
 import {
   WithId,
@@ -54,7 +54,10 @@ export const Restaurant: React.FC<RestaurantProps> = ({ user }) => {
       .collection(`restaurants`)
       .doc(restaurant_id)
       .collection(`ratings`)
-      .withDecoder<{ timestamp: string }>(timestampDecoder)
+      .withDecoder(({ timestamp, ...others }) => ({
+        ...others,
+        timestamp: timestampToYMDString(timestamp),
+      }))
       .fetch()
       .then((ret) => {
         setRatings(ret);

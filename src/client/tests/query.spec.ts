@@ -3,7 +3,7 @@ import { WebFirestoreTestUtil } from './util';
 
 import * as R from 'ramda';
 
-import { stringToTimestamp as st, timestampDecoder } from '../schema';
+import { stringToTimestamp as st } from '../schema';
 import type {
   DocumentProps,
   SubCollectionProps,
@@ -387,13 +387,15 @@ describe('[query withDecoder]', () => {
   test(`withDecoder`, async () => {
     const fetchedData = await firestore
       .collection('data2')
-      .withDecoder(timestampDecoder)
+      .withDecoder(({ timestamp, value }) => ({
+        timestamp: timestamp.toDate(),
+        value: value,
+      }))
       .fetch();
 
     const expected = testData2.map(({ timestamp, ...data }) => ({
       ...data,
-      timestamp: '', // timestamDecoderの型がtimestampはundefinedになっているため
-      ...timestampDecoder({ timestamp }),
+      timestamp: timestamp.toDate(),
     }));
 
     actVsExpAndIdCheck(

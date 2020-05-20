@@ -1,14 +1,13 @@
 import * as firebase from 'firebase';
-
+import { fromFirestoreStab } from './utils';
 import type {
   Collection,
-  DocumentProps,
-  WithId,
-  Substitute,
   Decoder,
+  DocumentProps,
   Encoder,
   Push,
   TupleStyle,
+  WithId,
 } from './type';
 
 export class Query<
@@ -20,8 +19,13 @@ export class Query<
 > {
   constructor(
     private qImpl: firebase.firestore.Query,
-    protected decoder?: (dbData: Partial<DocumentProps<D>>) => Partial<DDec>,
-    protected encoder?: (userData: Partial<DEnc>) => Partial<DocumentProps<D>>
+    protected fromFirestore: (dbData: DocumentProps<D>) => DDec = (d): DDec =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      d as any,
+    protected toFirestore: (userData: DEnc) => DocumentProps<D> = (
+      d
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ): DocumentProps<D> => d as any
   ) {}
 
   get firestore(): firebase.firestore.Firestore {
@@ -32,19 +36,26 @@ export class Query<
     options?: firebase.firestore.GetOptions
   ): Promise<firebase.firestore.QuerySnapshot<DocumentProps<D>>> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.qImpl.get(options) as any;
+    return (
+      this.qImpl
+        .withConverter({
+          fromFirestore: fromFirestoreStab(this.fromFirestore),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          toFirestore: this.toFirestore as any,
+          /* fromとtoで型定義に矛盾が出る場合があるため使わないこちらはanyにする */
+        })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .get(options) as any
+    );
   }
 
   fetch(options?: firebase.firestore.GetOptions): Promise<WithId<DDec>[]> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.qImpl.get(options).then((get) => {
+    return this.get(options).then((get) => {
       if (get.docs === undefined) return [];
       return get.docs.map((doc) => {
         const data = doc.data();
-        const decoded = this.decoder
-          ? this.decoder(data as DocumentProps<D>)
-          : data;
-        return { _id: doc.id, ...data, ...decoded };
+        return { ...data, _id: doc.id };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       }) as any;
     });
@@ -163,12 +174,10 @@ export class Query<
       retArr = [];
       snapshot.forEach((doc) => {
         const docData = doc.data();
-        const decoded = this.decoder ? this.decoder(docData) : {};
 
         retArr.push({
           _id: doc.id,
           ...docData,
-          ...decoded,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any);
       });
@@ -176,31 +185,25 @@ export class Query<
     });
   }
 
-  //Vは、Dのうち置換したい項目だけ書けばOK
   withDecoder<V extends object>(
-    decoder: Decoder<DocumentProps<D>, V>
-  ): Query<D, Substitute<DocumentProps<D>, V>, DEnc, Order> {
-    return new Query<D, Substitute<DocumentProps<D>, V>, DEnc, Order>(
+    fromFirestore: Decoder<DocumentProps<D>, V>
+  ): Query<D, V, DEnc, Order> {
+    return new Query<D, V, DEnc, Order>(
       this.qImpl,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      decoder as any,
-      this.encoder
+      fromFirestore as any,
+      this.toFirestore
     );
   }
 
-  //Vは、Dのうち置換したい項目だけ書けばOK
-  //TODO: Query<D, Substitute<DocumentProps<D>, V>, Order>の
-  //OrderをSubstituteObjArr<Order, V>に修正して、
-  //OrderBy指定後のStartAtなどを変換後のパラメータで指定
-  //できるようにしたかったが、あまりに複雑なため、とりあえず見送り
   withEncoder<V extends object>(
-    encoder: Encoder<DocumentProps<D>, V>
-  ): Query<D, DDec, Substitute<DocumentProps<D>, V>, Order> {
-    return new Query<D, DDec, Substitute<DocumentProps<D>, V>, Order>(
+    toFirestore: Encoder<DocumentProps<D>, V>
+  ): Query<D, DDec, V, Order> {
+    return new Query<D, DDec, V, Order>(
       this.qImpl,
-      this.decoder,
+      this.fromFirestore,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      encoder as any
+      toFirestore as any
     );
   }
 

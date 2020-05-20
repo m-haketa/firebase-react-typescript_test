@@ -39,13 +39,15 @@ export const stringToTimestamp = (stringDate: string): Timestamp =>
 export const timestampDecoder: Decoder<
   { timestamp: Timestamp },
   { timestamp: string }
-> = ({ timestamp }) => ({
+> = ({ timestamp, ...others }) => ({
   timestamp: timestampToYMDString(timestamp),
+  ...others,
 });
 
 export const timestampEncoder: Encoder<
   { timestamp: Timestamp },
   { timestamp: string }
-> = ({ timestamp }) => ({
+> = ({ timestamp, ...others }) => ({
   timestamp: stringToTimestamp(timestamp),
+  ...others,
 });
