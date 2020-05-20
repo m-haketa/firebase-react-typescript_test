@@ -1,10 +1,10 @@
 import * as firebase from 'firebase';
-import { fromFirestoreStab } from './utils';
+import { QueryWithDecoder } from './QueryWithDecoder';
+
 import type {
   Collection,
   Decoder,
   DocumentProps,
-  Encoder,
   Push,
   TupleStyle,
   WithId,
@@ -16,16 +16,7 @@ export class Query<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Order extends { [key: string]: any }[] = []
 > {
-  constructor(
-    private qImpl: firebase.firestore.Query,
-    protected fromFirestore: (dbData: DocumentProps<D>) => DDec = (d): DDec =>
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      d as any,
-    protected toFirestore: (userData: DDec) => DocumentProps<D> = (
-      d
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ): DocumentProps<D> => d as any
-  ) {}
+  constructor(private qImpl: firebase.firestore.Query) {}
 
   get firestore(): firebase.firestore.Firestore {
     return this.qImpl.firestore;
@@ -35,17 +26,7 @@ export class Query<
     options?: firebase.firestore.GetOptions
   ): Promise<firebase.firestore.QuerySnapshot<DocumentProps<D>>> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (
-      this.qImpl
-        .withConverter({
-          fromFirestore: fromFirestoreStab(this.fromFirestore),
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          toFirestore: this.toFirestore as any,
-          /* fromとtoで型定義に矛盾が出る場合があるため使わないこちらはanyにする */
-        })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .get(options) as any
-    );
+    return this.qImpl.get(options) as any;
   }
 
   fetch(options?: firebase.firestore.GetOptions): Promise<WithId<DDec>[]> {
@@ -184,23 +165,11 @@ export class Query<
 
   withDecoder<V extends object>(
     fromFirestore: Decoder<DocumentProps<D>, V>
-  ): Query<D, V, Order> {
-    return new Query<D, V, Order>(
+  ): QueryWithDecoder<D, V, Order> {
+    return new QueryWithDecoder<D, V, Order>(
       this.qImpl,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      fromFirestore as any,
-      this.toFirestore as any
-    );
-  }
-
-  withEncoder(
-    toFirestore: Encoder<DocumentProps<D>, DDec>
-  ): Query<D, DDec, Order> {
-    return new Query<D, DDec, Order>(
-      this.qImpl,
-      this.fromFirestore as any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      toFirestore as any
+      fromFirestore as any
     );
   }
 

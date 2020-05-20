@@ -13,6 +13,7 @@ import {
   DocumentProps as DP,
   Substitute as ST,
 } from '../firestoreWrapper/type';
+import { Timestamp } from '@client/firestoreWrapper/utils';
 
 interface RestaurantProps {
   user: UserCredential | undefined;
@@ -57,6 +58,10 @@ export const Restaurant: React.FC<RestaurantProps> = ({ user }) => {
       .withDecoder(({ timestamp, ...others }) => ({
         ...others,
         timestamp: timestampToYMDString(timestamp),
+      }))
+      .withEncoder(({ timestamp, ...others }) => ({
+        ...others,
+        timestamp: Timestamp.fromDate(new Date(timestamp)),
       }))
       .fetch()
       .then((ret) => {

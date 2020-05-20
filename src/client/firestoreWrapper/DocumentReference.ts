@@ -1,27 +1,12 @@
 import * as firebase from 'firebase';
 
 import { CollectionReference } from './CollectionReference';
-import { fromFirestoreStab } from './utils';
+import { DocumentReferenceWithDecoder } from './DocumentReferenceWithDecoder';
 
-import type {
-  Collection,
-  DocumentProps,
-  Decoder,
-  Encoder,
-  WithId,
-} from './type';
+import type { Collection, DocumentProps, Decoder, WithId } from './type';
 
 export class DocumentReference<D extends Collection, DDec = DocumentProps<D>> {
-  constructor(
-    private dImpl: firebase.firestore.DocumentReference,
-    protected fromFirestore: (dbData: DocumentProps<D>) => DDec = (d): DDec =>
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      d as any,
-    protected toFirestore: (userData: DDec) => DocumentProps<D> = (
-      d
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ): DocumentProps<D> => d as any
-  ) {}
+  constructor(private dImpl: firebase.firestore.DocumentReference) {}
 
   get firestore(): firebase.firestore.Firestore {
     return this.dImpl.firestore;
@@ -42,39 +27,20 @@ export class DocumentReference<D extends Collection, DDec = DocumentProps<D>> {
   get(
     options?: firebase.firestore.GetOptions
   ): Promise<firebase.firestore.DocumentSnapshot<DocumentProps<D>>> {
-    console.log('decoder:' + this.fromFirestore);
-    return (
-      this.dImpl
-        .withConverter({
-          fromFirestore: fromFirestoreStab(this.fromFirestore),
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          toFirestore: this.toFirestore as any,
-          /* fromとtoで型定義に矛盾が出る場合があるため使わないこちらはanyにする */
-        })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .get(options) as any
-    );
+    return this.dImpl.get(options);
   }
 
   fetch(
     options?: firebase.firestore.GetOptions
   ): Promise<WithId<DDec> | undefined> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.dImpl
-      .withConverter({
-        fromFirestore: fromFirestoreStab(this.fromFirestore),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        toFirestore: this.toFirestore as any,
-        /* fromとtoで型定義に矛盾が出る場合があるため使わないこちらはanyにする */
-      })
-      .get(options)
-      .then((doc) => {
-        const data = doc.data();
-        if (data === undefined) return undefined;
+    return this.dImpl.get(options).then((doc) => {
+      const data = doc.data();
+      if (data === undefined) return undefined;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return { _id: doc.id, ...data } as any;
-      });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return { _id: doc.id, ...data } as any;
+    });
   }
 
   collection<K extends keyof D['_collections']>(
@@ -86,17 +52,11 @@ export class DocumentReference<D extends Collection, DDec = DocumentProps<D>> {
   }
 
   set(data: DDec, options?: firebase.firestore.SetOptions): Promise<void> {
-    const converted = this.toFirestore
-      ? { ...data, ...this.toFirestore(data) }
-      : data;
-    return this.dImpl.set(converted, options);
+    return this.dImpl.set(data, options);
   }
 
   update(data: DDec): Promise<void> {
-    const converted = this.toFirestore
-      ? { ...data, ...this.toFirestore(data) }
-      : data;
-    return this.dImpl.update(converted);
+    return this.dImpl.update(data);
   }
 
   /* とりあえず、対応しない
@@ -113,23 +73,11 @@ export class DocumentReference<D extends Collection, DDec = DocumentProps<D>> {
 
   withDecoder<V extends object>(
     fromFirestore: Decoder<DocumentProps<D>, V>
-  ): DocumentReference<D, V> {
-    return new DocumentReference<D, V>(
+  ): DocumentReferenceWithDecoder<D, V> {
+    return new DocumentReferenceWithDecoder<D, V>(
       this.dImpl,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      fromFirestore as any,
-      this.toFirestore as any
-    );
-  }
-
-  withEncoder(
-    toFirestore: Encoder<DocumentProps<D>, DDec>
-  ): DocumentReference<D, DDec> {
-    return new DocumentReference<D, DDec>(
-      this.dImpl,
-      this.fromFirestore as any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      toFirestore as any
+      fromFirestore as any
     );
   }
 
