@@ -2,6 +2,7 @@ import * as firebase from 'firebase';
 
 import { Query } from './Query';
 import { DocumentReference } from './DocumentReference';
+import { fromFirestoreStab } from './utils';
 
 import type { Collection, DocumentProps, Decoder, Encoder } from './type';
 
@@ -42,14 +43,21 @@ export class CollectionReference<
   }
 
   add(data: DEnc): Promise<DocumentReference<D, DDec, DEnc>> {
-    const converted = this.toFirestore ? this.toFirestore(data) : data;
-    return this.cImpl.add(converted).then((dImplRet) => {
-      return new DocumentReference(
-        dImplRet,
-        this.fromFirestore,
-        this.toFirestore
-      );
-    });
+    return this.cImpl
+      .withConverter({
+        /* fromとtoで型定義に矛盾が出る場合があるため使わないこちらはanyにする */
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        fromFirestore: fromFirestoreStab(this.fromFirestore) as any,
+        toFirestore: this.toFirestore,
+      })
+      .add(data)
+      .then((dImplRet) => {
+        return new DocumentReference(
+          dImplRet,
+          this.fromFirestore,
+          this.toFirestore
+        );
+      });
   }
 
   withDecoder<V extends object>(

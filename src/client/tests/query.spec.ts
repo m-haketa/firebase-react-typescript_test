@@ -3,7 +3,9 @@ import { WebFirestoreTestUtil } from './util';
 
 import * as R from 'ramda';
 
-import { stringToTimestamp as st } from '../schema';
+import { stringToTimestamp as st, timestampToYMDString } from '../schema';
+
+import { Timestamp } from '../firestoreWrapper/utils';
 import type {
   DocumentProps,
   SubCollectionProps,
@@ -31,6 +33,13 @@ const schema /* :DatabaseType */ = {
   data2: {
     _documents: {
       value: 'aaa',
+      timestamp: st('2020-05-10'),
+    },
+    _collections: {},
+  },
+  dataforadd: {
+    _documents: {
+      value: 10,
       timestamp: st('2020-05-10'),
     },
     _collections: {},
@@ -404,5 +413,77 @@ describe('[query withDecoder]', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expected.sort(sortValue)
     );
+  });
+});
+
+describe('[collection add]', () => {
+  test('add', async () => {
+    const col = firestore.collection('dataforadd');
+
+    const data = {
+      timestamp: Timestamp.fromDate(new Date('2018-05-20')),
+      value: 10,
+    };
+
+    const doc = await col.add(data);
+
+    expect((await doc.get()).data()).toEqual(data);
+  });
+
+  test('collection add encode, document get decode', async () => {
+    const col = firestore.collection('dataforadd');
+
+    const data = {
+      timestamp: '2018-05-22',
+      value: 12,
+    };
+
+    type Col = typeof col;
+    const doc = await col
+      .withEncoder<typeof data>(({ timestamp, ...others }) => ({
+        ...others,
+        timestamp: Timestamp.fromDate(new Date(timestamp)),
+      }))
+      .add(data);
+
+    expect(
+      (
+        await doc
+          .withDecoder(({ timestamp, value }) => ({
+            timestamp: timestampToYMDString(timestamp),
+            value: value,
+          }))
+          .get()
+      ).data()
+    ).toEqual(data);
+  });
+
+  test('collection add encode, document fetch decode', async () => {
+    const col = firestore.collection('dataforadd');
+
+    const data = {
+      timestamp: '2018-05-25',
+      value: 15,
+    };
+
+    type Col = typeof col;
+    const doc = await col
+      .withEncoder<typeof data>(({ timestamp, ...others }) => ({
+        ...others,
+        timestamp: Timestamp.fromDate(new Date(timestamp)),
+      }))
+      .add(data);
+
+    const fetched = await doc
+      .withDecoder(({ timestamp, value }) => ({
+        timestamp: timestampToYMDString(timestamp),
+        value: value,
+      }))
+      .fetch();
+
+    expect(fetched).toEqual({
+      ...data,
+      _id: expect.anything(),
+    });
   });
 });

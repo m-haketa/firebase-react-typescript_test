@@ -1,7 +1,15 @@
 import * as firebase from 'firebase';
 
 import { CollectionReference } from './CollectionReference';
-import { Collection, DocumentProps, WithId } from './type';
+import { fromFirestoreStab } from './utils';
+
+import type {
+  Collection,
+  DocumentProps,
+  Decoder,
+  Encoder,
+  WithId,
+} from './type';
 
 export class DocumentReference<
   D extends Collection,
@@ -38,24 +46,39 @@ export class DocumentReference<
   get(
     options?: firebase.firestore.GetOptions
   ): Promise<firebase.firestore.DocumentSnapshot<DocumentProps<D>>> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.dImpl.get(options) as any;
+    console.log('decoder:' + this.fromFirestore);
+    return (
+      this.dImpl
+        .withConverter({
+          fromFirestore: fromFirestoreStab(this.fromFirestore),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          toFirestore: this.toFirestore as any,
+          /* fromとtoで型定義に矛盾が出る場合があるため使わないこちらはanyにする */
+        })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .get(options) as any
+    );
   }
 
   fetch(
     options?: firebase.firestore.GetOptions
   ): Promise<WithId<DDec> | undefined> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.dImpl.get(options).then((doc) => {
-      const data = doc.data();
-      if (data === undefined) return undefined;
+    return this.dImpl
+      .withConverter({
+        fromFirestore: fromFirestoreStab(this.fromFirestore),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        toFirestore: this.toFirestore as any,
+        /* fromとtoで型定義に矛盾が出る場合があるため使わないこちらはanyにする */
+      })
+      .get(options)
+      .then((doc) => {
+        const data = doc.data();
+        if (data === undefined) return undefined;
 
-      const decoded = this.fromFirestore
-        ? this.fromFirestore(data as DocumentProps<D>)
-        : data;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return { _id: doc.id, ...data, ...decoded } as any;
-    });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return { _id: doc.id, ...data } as any;
+      });
   }
 
   collection<K extends keyof D['_collections']>(
@@ -90,6 +113,28 @@ export class DocumentReference<
 
   delete(): Promise<void> {
     return this.dImpl.delete();
+  }
+
+  withDecoder<V extends object>(
+    fromFirestore: Decoder<DocumentProps<D>, V>
+  ): DocumentReference<D, V, DEnc> {
+    return new DocumentReference<D, V, DEnc>(
+      this.dImpl,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      fromFirestore as any,
+      this.toFirestore
+    );
+  }
+
+  withEncoder<V extends object>(
+    toFirestore: Encoder<DocumentProps<D>, V>
+  ): DocumentReference<D, DDec, V> {
+    return new DocumentReference<D, DDec, V>(
+      this.dImpl,
+      this.fromFirestore,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      toFirestore as any
+    );
   }
 
   /*

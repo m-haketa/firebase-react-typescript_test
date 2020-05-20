@@ -59,11 +59,11 @@ export type Substitute<T, S> = Omit<T, keyof S> & S;
 export type SubstAndPick<T, S> = keyof T extends keyof S ? Substitute<T, S> : T;
 
 export interface Decoder<DatabaseSchema, UserSchema> {
-  (dbData: DatabaseSchema): Substitute<DatabaseSchema, UserSchema>;
+  (dbData: DatabaseSchema): UserSchema;
 }
 
 export interface Encoder<DatabaseSchema, UserSchema> {
-  (userData: Substitute<DatabaseSchema, UserSchema>): DatabaseSchema;
+  (userData: UserSchema): DatabaseSchema;
 }
 
 //タプルの末尾に指定した型を追加
