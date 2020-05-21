@@ -8,8 +8,10 @@ class Firestore<D extends DatabaseType = DatabaseType> {
 
   collection<K extends keyof D>(
     collectionPath: string & K
-  ): CollectionReference<D[K]> {
-    return new CollectionReference<D[K]>(this.impl.collection(collectionPath));
+  ): CollectionReference<D[K]['_documents'], D[K]> {
+    return new CollectionReference<D[K]['_documents'], D[K]>(
+      this.impl.collection(collectionPath)
+    );
   }
 
   enableNetwork(): Promise<void> {

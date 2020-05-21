@@ -2,21 +2,22 @@ import * as firebase from 'firebase';
 import { fromFirestoreStab } from './utils';
 import { DocumentReference } from './DocumentReference';
 
-import type { Collection, DocumentProps, Encoder } from './type';
+import type { Document, Collection, Encoder } from './type';
 
 export class DocumentReferenceWithDecoder<
-  D extends Collection,
-  DDec = DocumentProps<D>
+  Doc extends Document,
+  SubCol extends Collection,
+  DDec = Doc
 > {
   constructor(
     private dImpl: firebase.firestore.DocumentReference,
-    protected fromFirestore: (dbData: DocumentProps<D>) => DDec
+    protected fromFirestore: (dbData: Doc) => DDec
   ) {}
 
   withEncoder(
-    toFirestore: Encoder<DocumentProps<D>, DDec>
-  ): DocumentReference<D, DDec> {
-    return new DocumentReference<D, DDec>(
+    toFirestore: Encoder<Doc, DDec>
+  ): DocumentReference<Doc, SubCol, DDec> {
+    return new DocumentReference<Doc, SubCol, DDec>(
       this.dImpl.withConverter({
         fromFirestore: fromFirestoreStab(this.fromFirestore),
         toFirestore: toFirestore,

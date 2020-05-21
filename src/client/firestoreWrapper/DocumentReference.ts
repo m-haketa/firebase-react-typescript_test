@@ -3,10 +3,14 @@ import * as firebase from 'firebase';
 import { CollectionReference } from './CollectionReference';
 import { DocumentReferenceWithDecoder } from './DocumentReferenceWithDecoder';
 
-import type { Collection, DocumentProps, Decoder, WithId } from './type';
+import type { Document, Collection, Decoder, WithId } from './type';
 
-export class DocumentReference<D extends Collection, DDec = DocumentProps<D>> {
-  constructor(private dImpl: firebase.firestore.DocumentReference) {}
+export class DocumentReference<
+  Doc extends Document,
+  SubCol extends Collection,
+  DDec = Doc
+> {
+  constructor(private dImpl: firebase.firestore.DocumentReference<DDec>) {}
 
   get firestore(): firebase.firestore.Firestore {
     return this.dImpl.firestore;
@@ -20,13 +24,13 @@ export class DocumentReference<D extends Collection, DDec = DocumentProps<D>> {
     return this.dImpl.path;
   }
 
-  isEqual(other: DocumentReference<D, DDec>): boolean {
+  isEqual(other: DocumentReference<Doc, SubCol, DDec>): boolean {
     return this.dImpl.isEqual(other.dImpl);
   }
 
   get(
     options?: firebase.firestore.GetOptions
-  ): Promise<firebase.firestore.DocumentSnapshot<DocumentProps<D>>> {
+  ): Promise<firebase.firestore.DocumentSnapshot<DDec>> {
     return this.dImpl.get(options);
   }
 
@@ -43,12 +47,13 @@ export class DocumentReference<D extends Collection, DDec = DocumentProps<D>> {
     });
   }
 
-  collection<K extends keyof D['_collections']>(
+  collection<K extends keyof SubCol['_collections']>(
     collectionPath: string & K
-  ): CollectionReference<D['_collections'][K]> {
-    return new CollectionReference<D['_collections'][K]>(
-      this.dImpl.collection(collectionPath)
-    );
+  ): CollectionReference<SubCol['_documents'], SubCol['_collections'][K]> {
+    return new CollectionReference<
+      SubCol['_documents'],
+      SubCol['_collections'][K]
+    >(this.dImpl.collection(collectionPath));
   }
 
   set(data: DDec, options?: firebase.firestore.SetOptions): Promise<void> {
@@ -72,9 +77,9 @@ export class DocumentReference<D extends Collection, DDec = DocumentProps<D>> {
   }
 
   withDecoder<V extends object>(
-    fromFirestore: Decoder<DocumentProps<D>, V>
-  ): DocumentReferenceWithDecoder<D, V> {
-    return new DocumentReferenceWithDecoder<D, V>(
+    fromFirestore: Decoder<Doc, V>
+  ): DocumentReferenceWithDecoder<Doc, SubCol, V> {
+    return new DocumentReferenceWithDecoder<Doc, SubCol, V>(
       this.dImpl,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       fromFirestore as any
