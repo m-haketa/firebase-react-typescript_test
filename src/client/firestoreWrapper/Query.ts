@@ -12,7 +12,7 @@ import type {
 
 export class Query<
   Doc extends Document,
-  SubCols extends SubCollections,
+  SubCols extends SubCollections = SubCollections,
   DDec = Doc,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Order extends { [key: string]: any }[] = []
