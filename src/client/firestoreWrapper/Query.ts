@@ -3,7 +3,7 @@ import { QueryWithDecoder } from './QueryWithDecoder';
 
 import type {
   Document,
-  Collection,
+  SubCollections,
   Decoder,
   Push,
   TupleStyle,
@@ -12,7 +12,7 @@ import type {
 
 export class Query<
   Doc extends Document,
-  SubCol extends Collection,
+  SubCol extends SubCollections,
   DDec = Doc,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Order extends { [key: string]: any }[] = []

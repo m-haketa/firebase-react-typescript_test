@@ -4,11 +4,11 @@ import { Query } from './Query';
 import { DocumentReference } from './DocumentReference';
 import { CollectionReferenceWithDecoder } from './CollectionReferenceWithDecoder';
 
-import type { Collection, DocumentProps, Decoder, Document } from './type';
+import type { SubCollections, Decoder, Document } from './type';
 
 export class CollectionReference<
   Doc extends Document,
-  SubCol extends Collection,
+  SubCol extends SubCollections,
   DDec = Doc
 > extends Query<Doc, SubCol, DDec> {
   constructor(private cImpl: firebase.firestore.CollectionReference<DDec>) {

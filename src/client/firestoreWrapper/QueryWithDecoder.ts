@@ -2,11 +2,11 @@ import * as firebase from 'firebase';
 import { fromFirestoreStab } from './utils';
 import { Query } from './Query';
 
-import type { Document, Collection, DocumentProps, Encoder } from './type';
+import type { Document, SubCollections, Encoder } from './type';
 
 export class QueryWithDecoder<
   Doc extends Document,
-  SubCol extends Collection,
+  SubCol extends SubCollections,
   DDec = Doc,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Order extends { [key: string]: any }[] = []

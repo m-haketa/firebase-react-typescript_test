@@ -38,9 +38,13 @@ export type Document = {
   [key: string]: unknown;
 };
 
+export type SubCollections = {
+  [key: string]: Collection;
+};
+
 export type Collection = {
   _documents: Document;
-  _collections: { [key: string]: Collection };
+  _collections: SubCollections;
 };
 
 //Collection型からdocumentの型を取り出す

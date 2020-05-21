@@ -2,12 +2,12 @@ import * as firebase from 'firebase';
 import { fromFirestoreStab } from './utils';
 import { CollectionReference } from './CollectionReference';
 
-import type { Document, Collection, Encoder } from './type';
+import type { Document, SubCollections, Encoder } from './type';
 import { QueryWithDecoder } from './QueryWithDecoder';
 
 export class CollectionReferenceWithDecoder<
   Doc extends Document,
-  SubCol extends Collection,
+  SubCol extends SubCollections,
   DDec = Doc
 > extends QueryWithDecoder<Doc, SubCol, DDec> {
   constructor(

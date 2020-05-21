@@ -3,11 +3,11 @@ import * as firebase from 'firebase';
 import { CollectionReference } from './CollectionReference';
 import { DocumentReferenceWithDecoder } from './DocumentReferenceWithDecoder';
 
-import type { Document, Collection, Decoder, WithId } from './type';
+import type { Document, SubCollections, Decoder, WithId } from './type';
 
 export class DocumentReference<
   Doc extends Document,
-  SubCol extends Collection,
+  SubCol extends SubCollections,
   DDec = Doc
 > {
   constructor(private dImpl: firebase.firestore.DocumentReference<DDec>) {}
@@ -47,12 +47,12 @@ export class DocumentReference<
     });
   }
 
-  collection<K extends keyof SubCol['_collections']>(
+  collection<K extends keyof SubCol>(
     collectionPath: string & K
-  ): CollectionReference<SubCol['_documents'], SubCol['_collections'][K]> {
+  ): CollectionReference<SubCol[K]['_documents'], SubCol[K]['_collections']> {
     return new CollectionReference<
-      SubCol['_documents'],
-      SubCol['_collections'][K]
+      SubCol[K]['_documents'],
+      SubCol[K]['_collections']
     >(this.dImpl.collection(collectionPath));
   }
 
