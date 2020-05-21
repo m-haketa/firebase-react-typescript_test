@@ -69,7 +69,7 @@ export class DocumentReference<
     return this.dImpl.set(data as DDec, options);
   }
 
-  update(data: AddFieldValue<DDec>): Promise<void> {
+  update(data: Partial<AddFieldValue<DDec>>): Promise<void> {
     return this.dImpl.update(data);
   }
 
