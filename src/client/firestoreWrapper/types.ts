@@ -21,7 +21,8 @@ export type ArrayUnion<T> = firebase.firestore.FieldValue & {
   readonly type: T;
 };
 
-export const ServerTimestamp: ServerTimestamp = firebase.firestore.FieldValue.serverTimestamp() as ServerTimestamp;
+export const ServerTimestamp = (): ServerTimestamp =>
+  firebase.firestore.FieldValue.serverTimestamp() as ServerTimestamp;
 
 export const Increment = (n: number): Increment =>
   firebase.firestore.FieldValue.increment(n) as Increment;
