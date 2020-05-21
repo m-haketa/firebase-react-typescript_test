@@ -10,5 +10,3 @@ export const fromFirestoreStab = <Doc extends Document, DDec>(
   const data = snapshot.data(options);
   return fromFirestore(data as Doc);
 };
-
-export const Timestamp = firebase.firestore.Timestamp;

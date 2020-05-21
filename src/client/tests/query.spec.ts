@@ -5,8 +5,8 @@ import * as R from 'ramda';
 
 import { stringToTimestamp as st, timestampToYMDString } from '../schema';
 
-import { Timestamp } from '../firestoreWrapper/utils';
-import type {
+import {
+  Timestamp,
   DocumentProps,
   SubCollectionProps,
 } from '../firestoreWrapper/types';

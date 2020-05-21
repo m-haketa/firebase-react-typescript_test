@@ -12,8 +12,8 @@ import {
   SubCollectionProps as SCP,
   DocumentProps as DP,
   Substitute as ST,
+  Timestamp,
 } from '../firestoreWrapper/types';
-import { Timestamp } from '@client/firestoreWrapper/utils';
 
 interface RestaurantProps {
   user: UserCredential | undefined;

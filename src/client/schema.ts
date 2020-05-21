@@ -1,7 +1,6 @@
 import { format } from 'date-fns/fp';
-import firebase from 'firebase';
 
-import type { Decoder, Encoder, Timestamp } from './firestoreWrapper/types';
+import { Decoder, Encoder, Timestamp } from './firestoreWrapper/types';
 
 //propsがオブジェクトの場合はcollectionを表す
 export type Database = {
@@ -34,7 +33,7 @@ export const timestampToYMDString = (timestamp: Timestamp): string =>
   format('yyyy-MM-dd')(timestamp.toDate());
 
 export const stringToTimestamp = (stringDate: string): Timestamp =>
-  firebase.firestore.Timestamp.fromDate(new Date(stringDate));
+  Timestamp.fromDate(new Date(stringDate));
 
 export const timestampDecoder: Decoder<
   { timestamp: Timestamp },
