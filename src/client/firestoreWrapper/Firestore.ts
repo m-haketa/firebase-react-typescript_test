@@ -47,7 +47,7 @@ class Firestore<D extends DatabaseType = DatabaseType> {
   */
 }
 
-export const firestoreWithAppSettings = <D extends DatabaseType = DatabaseType>(
+export const firestore = <D extends DatabaseType = DatabaseType>(
   app?: firebase.app.App,
   settings?: firebase.firestore.Settings
 ): Firestore<D> => {
@@ -56,10 +56,4 @@ export const firestoreWithAppSettings = <D extends DatabaseType = DatabaseType>(
     firestore.settings(settings);
   }
   return new Firestore<D>(firestore);
-};
-
-export const firestore = <D extends DatabaseType = DatabaseType>(): Firestore<
-  D
-> => {
-  return firestoreWithAppSettings<D>();
 };

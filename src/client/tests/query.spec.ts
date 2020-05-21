@@ -1,4 +1,4 @@
-import { firestoreWithAppSettings } from '../firestoreWrapper/Firestore';
+import { firestore as f } from '../firestoreWrapper/Firestore';
 import { WebFirestoreTestUtil } from './util';
 
 import * as R from 'ramda';
@@ -48,7 +48,7 @@ const schema /* :DatabaseType */ = {
 type Schema = typeof schema;
 
 const util = new WebFirestoreTestUtil({ isAdmin: true });
-const firestore = firestoreWithAppSettings<Schema>(util.app, util.settings);
+const firestore = f<Schema>(util.app, util.settings);
 
 const testData: DocumentProps<Schema['data']>[] = [
   { name: 'abc', value: 10 },

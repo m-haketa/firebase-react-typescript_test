@@ -1,4 +1,4 @@
-import { firestoreWithAppSettings } from '../firestoreWrapper/Firestore';
+import { firestore as f } from '../firestoreWrapper/Firestore';
 import { WebFirestoreTestUtil } from './util';
 
 const schema = {
@@ -8,7 +8,7 @@ const schema = {
 type Schema = typeof schema;
 
 const util = new WebFirestoreTestUtil({ isAdmin: true });
-const firestore = firestoreWithAppSettings(util.app, util.settings);
+const firestore = f(util.app, util.settings);
 
 const testData: Schema[] = [
   { name: 'abc', value: 10 },
