@@ -113,26 +113,26 @@ export class Query<
   }
 
   onSnapshot(observer: {
-    next?: (snapshot: firebase.firestore.QuerySnapshot<Doc>) => void;
+    next?: (snapshot: firebase.firestore.QuerySnapshot<DDec>) => void;
     error?: (error: Error) => void;
     complete?: () => void;
   }): () => void;
   onSnapshot(
     options: firebase.firestore.SnapshotListenOptions,
     observer: {
-      next?: (snapshot: firebase.firestore.QuerySnapshot<Doc>) => void;
+      next?: (snapshot: firebase.firestore.QuerySnapshot<DDec>) => void;
       error?: (error: Error) => void;
       complete?: () => void;
     }
   ): () => void;
   onSnapshot(
-    onNext: (snapshot: firebase.firestore.QuerySnapshot<Doc>) => void,
+    onNext: (snapshot: firebase.firestore.QuerySnapshot<DDec>) => void,
     onError?: (error: Error) => void,
     onCompletion?: () => void
   ): () => void;
   onSnapshot(
     options: firebase.firestore.SnapshotListenOptions,
-    onNext: (snapshot: firebase.firestore.QuerySnapshot<Doc>) => void,
+    onNext: (snapshot: firebase.firestore.QuerySnapshot<DDec>) => void,
     onError?: (error: Error) => void,
     onCompletion?: () => void
   ): () => void;
