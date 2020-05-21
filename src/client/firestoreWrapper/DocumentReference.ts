@@ -86,33 +86,38 @@ export class DocumentReference<
     );
   }
 
-  /*
-  readonly parent: CollectionReference<T>;
   onSnapshot(observer: {
-    next?: (snapshot: DocumentSnapshot<T>) => void;
-    error?: (error: FirestoreError) => void;
+    next?: (snapshot: firebase.firestore.DocumentSnapshot<DDec>) => void;
+    error?: (error: Error) => void;
     complete?: () => void;
   }): () => void;
   onSnapshot(
-    options: SnapshotListenOptions,
+    options: firebase.firestore.SnapshotListenOptions,
     observer: {
-      next?: (snapshot: DocumentSnapshot<T>) => void;
+      next?: (snapshot: firebase.firestore.DocumentSnapshot<DDec>) => void;
       error?: (error: Error) => void;
       complete?: () => void;
     }
   ): () => void;
   onSnapshot(
-    onNext: (snapshot: DocumentSnapshot<T>) => void,
+    onNext: (snapshot: firebase.firestore.DocumentSnapshot<DDec>) => void,
     onError?: (error: Error) => void,
     onCompletion?: () => void
   ): () => void;
   onSnapshot(
-    options: SnapshotListenOptions,
-    onNext: (snapshot: DocumentSnapshot<T>) => void,
+    options: firebase.firestore.SnapshotListenOptions,
+    onNext: (snapshot: firebase.firestore.DocumentSnapshot<DDec>) => void,
     onError?: (error: Error) => void,
     onCompletion?: () => void
   ): () => void;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onSnapshot(param1: any, ...params: any[]): () => void {
+    return this.dImpl.onSnapshot(param1, ...params);
+  }
+
+  /*
+  readonly parent: CollectionReference<T>;
   withConverter<U>(
     converter: FirestoreDataConverter<U>
   ): DocumentReference<U>;
