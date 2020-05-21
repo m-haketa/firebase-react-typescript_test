@@ -3,6 +3,65 @@ import * as firebase from 'firebase';
 export const Timestamp = firebase.firestore.Timestamp;
 export type Timestamp = firebase.firestore.Timestamp;
 
+export type Increment = firebase.firestore.FieldValue & {
+  readonly _Increment: unique symbol;
+};
+
+export type ServerTimestamp = firebase.firestore.FieldValue & {
+  readonly _ServerTimestamp: unique symbol;
+};
+
+export type ArrayRemove<T> = firebase.firestore.FieldValue & {
+  readonly _ArrayRemove: unique symbol;
+  readonly type: T;
+};
+
+export type ArrayUnion<T> = firebase.firestore.FieldValue & {
+  readonly _ArrayUnion: unique symbol;
+  readonly type: T;
+};
+
+export const ServerTimestamp: ServerTimestamp = firebase.firestore.FieldValue.serverTimestamp() as ServerTimestamp;
+
+export const Increment = (n: number): Increment =>
+  firebase.firestore.FieldValue.increment(n) as Increment;
+
+export const ArrayRemove = <T>(...elements: T[]): ArrayRemove<T> =>
+  firebase.firestore.FieldValue.arrayRemove(...elements) as ArrayRemove<T>;
+
+export const ArrayUnion = <T>(...elements: T[]): ArrayUnion<T> =>
+  firebase.firestore.FieldValue.arrayUnion(...elements) as ArrayUnion<T>;
+
+export type AddFieldValue<T extends object> = {
+  [K in keyof T]: T[K] extends number | undefined
+    ? T[K] | Increment
+    : T[K] extends Timestamp | undefined
+    ? T[K] | ServerTimestamp
+    : T[K] extends (infer A)[] | undefined
+    ? T[K] | ArrayRemove<A> | ArrayUnion<A>
+    : T[K] extends object
+    ? AddFieldValue<T[K]>
+    : T[K];
+};
+
+/*
+export const arrayTest = <T>(...elements: T[]): T[] =>
+  (firebase.firestore.FieldValue.arrayRemove(elements) as any) as T[];
+
+type T = AddFieldValue<{
+  a?: number;
+  b?: Timestamp;
+  c?: number[];
+  d?: string;
+  e?: string[];
+  f: {
+    g: number;
+    h: string;
+  };
+}>;
+const t: T = { a: Increment(1), f: { g: Increment(2), h: 'a' } };
+*/
+
 //collection-document-collection・・・の構造を、オブジェクトで表す。
 //
 //例：

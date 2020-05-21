@@ -4,7 +4,7 @@ import { Query } from './Query';
 import { DocumentReference } from './DocumentReference';
 import { CollectionReferenceWithDecoder } from './CollectionReferenceWithDecoder';
 
-import type { SubCollections, Decoder, Document } from './types';
+import type { AddFieldValue, SubCollections, Decoder, Document } from './types';
 
 export class CollectionReference<
   Doc extends Document,
@@ -33,8 +33,10 @@ export class CollectionReference<
     );
   }
 
-  add(data: DDec): Promise<DocumentReference<Doc, SubCols, DDec>> {
-    return this.cImpl.add(data).then((dImplRet) => {
+  add(
+    data: AddFieldValue<DDec>
+  ): Promise<DocumentReference<Doc, SubCols, DDec>> {
+    return this.cImpl.add(data as DDec).then((dImplRet) => {
       return new DocumentReference(dImplRet);
     });
   }

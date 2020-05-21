@@ -3,7 +3,13 @@ import * as firebase from 'firebase';
 import { CollectionReference } from './CollectionReference';
 import { DocumentReferenceWithDecoder } from './DocumentReferenceWithDecoder';
 
-import type { Document, SubCollections, Decoder, WithId } from './types';
+import {
+  Document,
+  SubCollections,
+  Decoder,
+  WithId,
+  AddFieldValue,
+} from './types';
 
 export class DocumentReference<
   Doc extends Document,
@@ -56,11 +62,14 @@ export class DocumentReference<
     >(this.dImpl.collection(collectionPath));
   }
 
-  set(data: DDec, options?: firebase.firestore.SetOptions): Promise<void> {
-    return this.dImpl.set(data, options);
+  set(
+    data: AddFieldValue<DDec>,
+    options?: firebase.firestore.SetOptions
+  ): Promise<void> {
+    return this.dImpl.set(data as DDec, options);
   }
 
-  update(data: DDec): Promise<void> {
+  update(data: AddFieldValue<DDec>): Promise<void> {
     return this.dImpl.update(data);
   }
 
