@@ -49,6 +49,13 @@ export class CollectionReference<
     );
   }
 
+  //withDecoder、withEncoder後に、setDocumentTypeを使うと、
+  //型が壊れる可能性があるがとりあえずは無視
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  setDocumentType<V extends Document>(dummy?: V): CollectionReference<V> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return new CollectionReference<V>(this.cImpl as any);
+  }
   /*
   readonly parent: DocumentReference<DocumentData> | null;
   withConverter<U>(
