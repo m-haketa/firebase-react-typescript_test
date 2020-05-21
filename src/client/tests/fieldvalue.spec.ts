@@ -1,9 +1,7 @@
 import { firestore as f } from '../firestoreWrapper/Firestore';
 import { WebFirestoreTestUtil } from './testUtils';
 
-import * as R from 'ramda';
-
-import { stringToTimestamp as st, timestampToYMDString } from '../schema';
+import { stringToTimestamp as st } from '../schema';
 
 import {
   ServerTimestamp,
@@ -20,7 +18,9 @@ const schema /* :DatabaseType */ = {
     _documents: {
       timestamp: st('2020-05-10'),
       value: 10,
+      value2: 20,
       arr: [] as string[],
+      arr2: [] as number[],
       obj: {
         a: 10,
         b: 'a',
@@ -49,7 +49,9 @@ describe('[server timestamp]', () => {
     const data = {
       timestamp: ServerTimestamp(),
       value: Increment(2),
+      value2: 10,
       arr: ArrayUnion('abc', 'def'),
+      arr2: ArrayRemove(10),
       obj: {
         a: 1,
         b: '20',
@@ -63,7 +65,9 @@ describe('[server timestamp]', () => {
     expect((await doc.get()).data()).toEqual({
       timestamp: expect.anything(),
       value: 2,
+      value2: 10,
       arr: ['abc', 'def'],
+      arr2: [],
       obj: {
         a: 1,
         b: '20',
@@ -74,13 +78,15 @@ describe('[server timestamp]', () => {
   });
 });
 
-test('update collection', async () => {
+test('update doc', async () => {
   const col = firestore.collection('dataforadd');
 
   const data = {
     timestamp: ServerTimestamp(),
     value: 5,
+    value2: 2,
     arr: ArrayUnion('ghi', 'jkl'),
+    arr2: ArrayUnion(10, 20),
     obj: {
       a: 6,
       b: '40',
@@ -94,24 +100,26 @@ test('update collection', async () => {
   await doc.update({
     timestamp: ServerTimestamp(),
     value: Increment(3),
+    value2: Increment(1),
     arr: ArrayUnion('mno', 'p'),
+    arr2: ArrayRemove(10, 15),
     obj: {
       a: 8,
       b: '60',
-      c: st('2018-05-05'),
-      arr: [5],
     },
   });
 
   expect((await doc.get()).data()).toEqual({
     timestamp: expect.anything(),
     value: 8,
+    value2: 3,
     arr: ['ghi', 'jkl', 'mno', 'p'],
+    arr2: [20],
     obj: {
       a: 8,
       b: '60',
-      c: st('2018-05-05'),
-      arr: [5],
+      //c: st('2018-05-01'),
+      //arr: [10, 20],
     },
   });
 });
