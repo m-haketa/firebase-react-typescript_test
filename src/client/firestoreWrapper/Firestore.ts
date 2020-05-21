@@ -1,7 +1,7 @@
 import * as firebase from 'firebase';
 
 import { CollectionReference } from './CollectionReference';
-import type { DatabaseType } from './type';
+import type { DatabaseType } from './types';
 
 class Firestore<D extends DatabaseType = DatabaseType> {
   constructor(private impl: firebase.firestore.Firestore) {}

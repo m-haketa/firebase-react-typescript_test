@@ -5,7 +5,7 @@ import * as firebase from 'firebase';
 import { firestore } from './firestoreWrapper/Firestore';
 import { Database } from './schema';
 
-import { WithId, DocumentProps as DP } from './firestoreWrapper/type';
+import { WithId, DocumentProps as DP } from './firestoreWrapper/types';
 
 export type Restaurant = WithId<DP<Database['restaurants']>>;
 

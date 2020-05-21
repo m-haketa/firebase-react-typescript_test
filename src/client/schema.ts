@@ -1,7 +1,7 @@
 import { format } from 'date-fns/fp';
 import firebase from 'firebase';
 
-import type { Decoder, Encoder, Timestamp } from './firestoreWrapper/type';
+import type { Decoder, Encoder, Timestamp } from './firestoreWrapper/types';
 
 //propsがオブジェクトの場合はcollectionを表す
 export type Database = {

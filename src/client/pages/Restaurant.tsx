@@ -12,7 +12,7 @@ import {
   SubCollectionProps as SCP,
   DocumentProps as DP,
   Substitute as ST,
-} from '../firestoreWrapper/type';
+} from '../firestoreWrapper/types';
 import { Timestamp } from '@client/firestoreWrapper/utils';
 
 interface RestaurantProps {

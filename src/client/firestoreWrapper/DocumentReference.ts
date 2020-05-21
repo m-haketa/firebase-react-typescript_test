@@ -3,7 +3,7 @@ import * as firebase from 'firebase';
 import { CollectionReference } from './CollectionReference';
 import { DocumentReferenceWithDecoder } from './DocumentReferenceWithDecoder';
 
-import type { Document, SubCollections, Decoder, WithId } from './type';
+import type { Document, SubCollections, Decoder, WithId } from './types';
 
 export class DocumentReference<
   Doc extends Document,

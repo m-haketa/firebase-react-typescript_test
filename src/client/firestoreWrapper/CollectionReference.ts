@@ -4,7 +4,7 @@ import { Query } from './Query';
 import { DocumentReference } from './DocumentReference';
 import { CollectionReferenceWithDecoder } from './CollectionReferenceWithDecoder';
 
-import type { SubCollections, Decoder, Document } from './type';
+import type { SubCollections, Decoder, Document } from './types';
 
 export class CollectionReference<
   Doc extends Document,

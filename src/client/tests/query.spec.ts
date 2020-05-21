@@ -9,7 +9,7 @@ import { Timestamp } from '../firestoreWrapper/utils';
 import type {
   DocumentProps,
   SubCollectionProps,
-} from '../firestoreWrapper/type';
+} from '../firestoreWrapper/types';
 
 //schema定義（まずは、具体的な値で）
 //作成するときには、いったん、DatabaseType型で作成すると、制約がかかるので書きやすい

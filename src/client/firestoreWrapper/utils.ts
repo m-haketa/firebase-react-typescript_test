@@ -1,5 +1,5 @@
 import * as firebase from 'firebase';
-import type { Document } from './type';
+import type { Document } from './types';
 
 export const fromFirestoreStab = <Doc extends Document, DDec>(
   fromFirestore: (dbData: Doc) => DDec

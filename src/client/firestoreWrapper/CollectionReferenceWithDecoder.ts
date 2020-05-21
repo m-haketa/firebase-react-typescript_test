@@ -2,7 +2,7 @@ import * as firebase from 'firebase';
 import { fromFirestoreStab } from './utils';
 import { CollectionReference } from './CollectionReference';
 
-import type { Document, SubCollections, Encoder } from './type';
+import type { Document, SubCollections, Encoder } from './types';
 import { QueryWithDecoder } from './QueryWithDecoder';
 
 export class CollectionReferenceWithDecoder<

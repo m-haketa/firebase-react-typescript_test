@@ -8,7 +8,7 @@ import type {
   Push,
   TupleStyle,
   WithId,
-} from './type';
+} from './types';
 
 export class Query<
   Doc extends Document,
