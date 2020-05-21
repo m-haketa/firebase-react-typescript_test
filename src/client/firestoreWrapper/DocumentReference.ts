@@ -9,6 +9,7 @@ import {
   Decoder,
   WithId,
   AddFieldValue,
+  DeepPartial,
 } from './types';
 
 export class DocumentReference<
@@ -69,7 +70,7 @@ export class DocumentReference<
     return this.dImpl.set(data as DDec, options);
   }
 
-  update(data: Partial<AddFieldValue<DDec>>): Promise<void> {
+  update(data: DeepPartial<AddFieldValue<DDec>>): Promise<void> {
     return this.dImpl.update(data);
   }
 
