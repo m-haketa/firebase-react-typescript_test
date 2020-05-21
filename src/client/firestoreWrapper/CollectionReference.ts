@@ -9,7 +9,7 @@ import type { SubCollections, Decoder, Document } from './types';
 export class CollectionReference<
   Doc extends Document,
   SubCols extends SubCollections = SubCollections,
-  DDec = Doc
+  DDec extends Document = Doc
 > extends Query<Doc, SubCols, DDec> {
   constructor(private cImpl: firebase.firestore.CollectionReference<DDec>) {
     super(cImpl);
@@ -39,7 +39,7 @@ export class CollectionReference<
     });
   }
 
-  withDecoder<V extends object>(
+  withDecoder<V extends Document>(
     fromFirestore: Decoder<Doc, V>
   ): CollectionReferenceWithDecoder<Doc, SubCols, V> {
     return new CollectionReferenceWithDecoder<Doc, SubCols, V>(

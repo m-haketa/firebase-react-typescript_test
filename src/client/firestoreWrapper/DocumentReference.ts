@@ -8,7 +8,7 @@ import type { Document, SubCollections, Decoder, WithId } from './types';
 export class DocumentReference<
   Doc extends Document,
   SubCols extends SubCollections = SubCollections,
-  DDec = Doc
+  DDec extends Document = Doc
 > {
   constructor(private dImpl: firebase.firestore.DocumentReference<DDec>) {}
 
@@ -76,7 +76,7 @@ export class DocumentReference<
     return this.dImpl.delete();
   }
 
-  withDecoder<V extends object>(
+  withDecoder<V extends Document>(
     fromFirestore: Decoder<Doc, V>
   ): DocumentReferenceWithDecoder<Doc, SubCols, V> {
     return new DocumentReferenceWithDecoder<Doc, SubCols, V>(

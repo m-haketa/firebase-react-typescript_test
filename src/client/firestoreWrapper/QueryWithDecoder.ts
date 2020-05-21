@@ -7,7 +7,7 @@ import type { Document, SubCollections, Encoder } from './types';
 export class QueryWithDecoder<
   Doc extends Document,
   SubCols extends SubCollections,
-  DDec = Doc,
+  DDec extends Document = Doc,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Order extends { [key: string]: any }[] = []
 > {

@@ -13,7 +13,7 @@ import type {
 export class Query<
   Doc extends Document,
   SubCols extends SubCollections = SubCollections,
-  DDec = Doc,
+  DDec extends Document = Doc,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Order extends { [key: string]: any }[] = []
 > {
@@ -160,7 +160,7 @@ export class Query<
     });
   }
 
-  withDecoder<V extends object>(
+  withDecoder<V extends Document>(
     fromFirestore: Decoder<Doc, V>
   ): QueryWithDecoder<Doc, SubCols, V, Order> {
     return new QueryWithDecoder<Doc, SubCols, V, Order>(

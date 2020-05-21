@@ -8,7 +8,7 @@ import { QueryWithDecoder } from './QueryWithDecoder';
 export class CollectionReferenceWithDecoder<
   Doc extends Document,
   SubCols extends SubCollections,
-  DDec = Doc
+  DDec extends Document = Doc
 > extends QueryWithDecoder<Doc, SubCols, DDec> {
   constructor(
     private cImpl: firebase.firestore.CollectionReference,
