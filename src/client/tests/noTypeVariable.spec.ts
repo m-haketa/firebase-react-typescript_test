@@ -1,5 +1,5 @@
 import { firestore as f } from '../firestoreWrapper/Firestore';
-import { WebFirestoreTestUtil } from './util';
+import { WebFirestoreTestUtil } from './testUtils';
 
 const schema = {
   name: 'aaa',
