@@ -47,14 +47,14 @@ describe('[server timestamp]', () => {
     const col = firestore.collection('dataforadd');
 
     const data = {
-      timestamp: ServerTimestamp,
+      timestamp: ServerTimestamp(),
       value: Increment(2),
       arr: ArrayUnion('abc', 'def'),
       obj: {
-        a: Increment(1),
+        a: 1,
         b: '20',
-        c: ServerTimestamp,
-        arr: ArrayRemove(10),
+        c: st('2018-05-01'),
+        arr: [1, 2, 3],
       },
     };
 
@@ -67,9 +67,51 @@ describe('[server timestamp]', () => {
       obj: {
         a: 1,
         b: '20',
-        c: expect.anything(),
-        arr: [],
+        c: st('2018-05-01'),
+        arr: [1, 2, 3],
       },
     });
+  });
+});
+
+test('update collection', async () => {
+  const col = firestore.collection('dataforadd');
+
+  const data = {
+    timestamp: ServerTimestamp(),
+    value: 5,
+    arr: ArrayUnion('ghi', 'jkl'),
+    obj: {
+      a: 6,
+      b: '40',
+      c: st('2018-05-01'),
+      arr: [10, 20],
+    },
+  };
+
+  const doc = await col.add(data);
+
+  await doc.update({
+    timestamp: ServerTimestamp(),
+    value: Increment(3),
+    arr: ArrayUnion('mno', 'p'),
+    obj: {
+      a: 8,
+      b: '60',
+      c: st('2018-05-05'),
+      arr: [5],
+    },
+  });
+
+  expect((await doc.get()).data()).toEqual({
+    timestamp: expect.anything(),
+    value: 8,
+    arr: ['ghi', 'jkl', 'mno', 'p'],
+    obj: {
+      a: 8,
+      b: '60',
+      c: st('2018-05-05'),
+      arr: [5],
+    },
   });
 });
