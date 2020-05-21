@@ -7,7 +7,7 @@ import type { Document, SubCollections, Decoder, WithId } from './type';
 
 export class DocumentReference<
   Doc extends Document,
-  SubCol extends SubCollections,
+  SubCols extends SubCollections,
   DDec = Doc
 > {
   constructor(private dImpl: firebase.firestore.DocumentReference<DDec>) {}
@@ -24,7 +24,7 @@ export class DocumentReference<
     return this.dImpl.path;
   }
 
-  isEqual(other: DocumentReference<Doc, SubCol, DDec>): boolean {
+  isEqual(other: DocumentReference<Doc, SubCols, DDec>): boolean {
     return this.dImpl.isEqual(other.dImpl);
   }
 
@@ -47,12 +47,12 @@ export class DocumentReference<
     });
   }
 
-  collection<K extends keyof SubCol>(
+  collection<K extends keyof SubCols>(
     collectionPath: string & K
-  ): CollectionReference<SubCol[K]['_documents'], SubCol[K]['_collections']> {
+  ): CollectionReference<SubCols[K]['_documents'], SubCols[K]['_collections']> {
     return new CollectionReference<
-      SubCol[K]['_documents'],
-      SubCol[K]['_collections']
+      SubCols[K]['_documents'],
+      SubCols[K]['_collections']
     >(this.dImpl.collection(collectionPath));
   }
 
@@ -78,8 +78,8 @@ export class DocumentReference<
 
   withDecoder<V extends object>(
     fromFirestore: Decoder<Doc, V>
-  ): DocumentReferenceWithDecoder<Doc, SubCol, V> {
-    return new DocumentReferenceWithDecoder<Doc, SubCol, V>(
+  ): DocumentReferenceWithDecoder<Doc, SubCols, V> {
+    return new DocumentReferenceWithDecoder<Doc, SubCols, V>(
       this.dImpl,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       fromFirestore as any

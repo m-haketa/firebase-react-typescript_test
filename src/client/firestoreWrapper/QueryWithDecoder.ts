@@ -6,7 +6,7 @@ import type { Document, SubCollections, Encoder } from './type';
 
 export class QueryWithDecoder<
   Doc extends Document,
-  SubCol extends SubCollections,
+  SubCols extends SubCollections,
   DDec = Doc,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Order extends { [key: string]: any }[] = []
@@ -18,8 +18,8 @@ export class QueryWithDecoder<
 
   withEncoder(
     toFirestore: Encoder<Doc, DDec>
-  ): Query<Doc, SubCol, DDec, Order> {
-    return new Query<Doc, SubCol, DDec, Order>(
+  ): Query<Doc, SubCols, DDec, Order> {
+    return new Query<Doc, SubCols, DDec, Order>(
       this.qImpl.withConverter({
         fromFirestore: fromFirestoreStab(this.fromFirestore),
         toFirestore: toFirestore,

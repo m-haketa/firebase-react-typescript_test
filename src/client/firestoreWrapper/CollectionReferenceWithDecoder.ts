@@ -7,9 +7,9 @@ import { QueryWithDecoder } from './QueryWithDecoder';
 
 export class CollectionReferenceWithDecoder<
   Doc extends Document,
-  SubCol extends SubCollections,
+  SubCols extends SubCollections,
   DDec = Doc
-> extends QueryWithDecoder<Doc, SubCol, DDec> {
+> extends QueryWithDecoder<Doc, SubCols, DDec> {
   constructor(
     private cImpl: firebase.firestore.CollectionReference,
     protected fromFirestore: (dbData: Doc) => DDec
@@ -19,8 +19,8 @@ export class CollectionReferenceWithDecoder<
 
   withEncoder(
     toFirestore: Encoder<Doc, DDec>
-  ): CollectionReference<Doc, SubCol, DDec> {
-    return new CollectionReference<Doc, SubCol, DDec>(
+  ): CollectionReference<Doc, SubCols, DDec> {
+    return new CollectionReference<Doc, SubCols, DDec>(
       this.cImpl.withConverter({
         fromFirestore: fromFirestoreStab(this.fromFirestore),
         toFirestore: toFirestore,

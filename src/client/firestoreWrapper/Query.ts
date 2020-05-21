@@ -12,7 +12,7 @@ import type {
 
 export class Query<
   Doc extends Document,
-  SubCol extends SubCollections,
+  SubCols extends SubCollections,
   DDec = Doc,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Order extends { [key: string]: any }[] = []
@@ -44,8 +44,8 @@ export class Query<
     fieldPath: (K & string) | firebase.firestore.FieldPath,
     opStr: firebase.firestore.WhereFilterOp,
     value: Doc[K]
-  ): Query<Doc, SubCol, DDec, Order> {
-    return new Query<Doc, SubCol, DDec, Order>(
+  ): Query<Doc, SubCols, DDec, Order> {
+    return new Query<Doc, SubCols, DDec, Order>(
       this.qImpl.where(fieldPath, opStr, value)
     );
   }
@@ -53,60 +53,62 @@ export class Query<
   orderBy<K extends keyof DDec>(
     fieldPath: (K & string) | firebase.firestore.FieldPath,
     directionStr?: firebase.firestore.OrderByDirection
-  ): Query<Doc, SubCol, DDec, Push<Order, Pick<DDec, K>>> {
-    return new Query<Doc, SubCol, DDec, Push<Order, Pick<DDec, K>>>(
+  ): Query<Doc, SubCols, DDec, Push<Order, Pick<DDec, K>>> {
+    return new Query<Doc, SubCols, DDec, Push<Order, Pick<DDec, K>>>(
       this.qImpl.orderBy(fieldPath, directionStr)
     );
   }
 
-  limit(limit: number): Query<Doc, SubCol, DDec, Order> {
-    return new Query<Doc, SubCol, DDec, Order>(this.qImpl.limit(limit));
+  limit(limit: number): Query<Doc, SubCols, DDec, Order> {
+    return new Query<Doc, SubCols, DDec, Order>(this.qImpl.limit(limit));
   }
 
-  limitToLast(limit: number): Query<Doc, SubCol, DDec, Order> {
-    return new Query<Doc, SubCol, DDec, Order>(this.qImpl.limitToLast(limit));
+  limitToLast(limit: number): Query<Doc, SubCols, DDec, Order> {
+    return new Query<Doc, SubCols, DDec, Order>(this.qImpl.limitToLast(limit));
   }
 
   startAt(
     snapshot: firebase.firestore.DocumentSnapshot<unknown>
-  ): Query<Doc, SubCol, DDec, Order>;
-  startAt(...params: TupleStyle<Order>): Query<Doc, SubCol, DDec, Order>;
-  startAt(...params: unknown[]): Query<Doc, SubCol, DDec, Order> {
+  ): Query<Doc, SubCols, DDec, Order>;
+  startAt(...params: TupleStyle<Order>): Query<Doc, SubCols, DDec, Order>;
+  startAt(...params: unknown[]): Query<Doc, SubCols, DDec, Order> {
     //if (params[0] instanceof firebase.firestore.DocumentSnapshot) {
     //  //snapshotオブジェクトの場合
-    //  return new Query<Doc, SubCol, DDec, Order>(this.qImpl.startAt(...params));
+    //  return new Query<Doc, SubCols, DDec, Order>(this.qImpl.startAt(...params));
     //}
     //TODO:withConverter使用に伴う引数置換のロジックを入れるならここだが難しすぎるため見送り
-    return new Query<Doc, SubCol, DDec, Order>(this.qImpl.startAt(...params));
+    return new Query<Doc, SubCols, DDec, Order>(this.qImpl.startAt(...params));
   }
 
   startAfter(
     snapshot: firebase.firestore.DocumentSnapshot<unknown>
-  ): Query<Doc, SubCol, DDec, Order>;
-  startAfter(...params: TupleStyle<Order>): Query<Doc, SubCol, DDec, Order>;
-  startAfter(...params: unknown[]): Query<Doc, SubCol, DDec, Order> {
-    return new Query<Doc, SubCol, DDec, Order>(
+  ): Query<Doc, SubCols, DDec, Order>;
+  startAfter(...params: TupleStyle<Order>): Query<Doc, SubCols, DDec, Order>;
+  startAfter(...params: unknown[]): Query<Doc, SubCols, DDec, Order> {
+    return new Query<Doc, SubCols, DDec, Order>(
       this.qImpl.startAfter(...params)
     );
   }
 
   endBefore(
     snapshot: firebase.firestore.DocumentSnapshot<unknown>
-  ): Query<Doc, SubCol, DDec, Order>;
-  endBefore(...params: TupleStyle<Order>): Query<Doc, SubCol, DDec, Order>;
-  endBefore(...params: unknown[]): Query<Doc, SubCol, DDec, Order> {
-    return new Query<Doc, SubCol, DDec, Order>(this.qImpl.endBefore(...params));
+  ): Query<Doc, SubCols, DDec, Order>;
+  endBefore(...params: TupleStyle<Order>): Query<Doc, SubCols, DDec, Order>;
+  endBefore(...params: unknown[]): Query<Doc, SubCols, DDec, Order> {
+    return new Query<Doc, SubCols, DDec, Order>(
+      this.qImpl.endBefore(...params)
+    );
   }
 
   endAt(
     snapshot: firebase.firestore.DocumentSnapshot<unknown>
-  ): Query<Doc, SubCol, DDec, Order>;
-  endAt(...params: TupleStyle<Order>): Query<Doc, SubCol, DDec, Order>;
-  endAt(...params: unknown[]): Query<Doc, SubCol, DDec, Order> {
-    return new Query<Doc, SubCol, DDec, Order>(this.qImpl.endAt(...params));
+  ): Query<Doc, SubCols, DDec, Order>;
+  endAt(...params: TupleStyle<Order>): Query<Doc, SubCols, DDec, Order>;
+  endAt(...params: unknown[]): Query<Doc, SubCols, DDec, Order> {
+    return new Query<Doc, SubCols, DDec, Order>(this.qImpl.endAt(...params));
   }
 
-  isEqual(other: Query<Doc, SubCol, DDec, Order>): boolean {
+  isEqual(other: Query<Doc, SubCols, DDec, Order>): boolean {
     return this.qImpl.isEqual(other.qImpl);
   }
 
@@ -160,8 +162,8 @@ export class Query<
 
   withDecoder<V extends object>(
     fromFirestore: Decoder<Doc, V>
-  ): QueryWithDecoder<Doc, SubCol, V, Order> {
-    return new QueryWithDecoder<Doc, SubCol, V, Order>(
+  ): QueryWithDecoder<Doc, SubCols, V, Order> {
+    return new QueryWithDecoder<Doc, SubCols, V, Order>(
       this.qImpl,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       fromFirestore as any

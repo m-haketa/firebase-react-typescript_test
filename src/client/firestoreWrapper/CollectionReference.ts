@@ -8,9 +8,9 @@ import type { SubCollections, Decoder, Document } from './type';
 
 export class CollectionReference<
   Doc extends Document,
-  SubCol extends SubCollections,
+  SubCols extends SubCollections,
   DDec = Doc
-> extends Query<Doc, SubCol, DDec> {
+> extends Query<Doc, SubCols, DDec> {
   constructor(private cImpl: firebase.firestore.CollectionReference<DDec>) {
     super(cImpl);
   }
@@ -23,17 +23,17 @@ export class CollectionReference<
     return this.cImpl.path;
   }
 
-  isEqual(other: CollectionReference<Doc, SubCol, DDec>): boolean {
+  isEqual(other: CollectionReference<Doc, SubCols, DDec>): boolean {
     return this.cImpl.isEqual(other.cImpl);
   }
 
-  doc(documentPath?: string): DocumentReference<Doc, SubCol, DDec> {
-    return new DocumentReference<Doc, SubCol, DDec>(
+  doc(documentPath?: string): DocumentReference<Doc, SubCols, DDec> {
+    return new DocumentReference<Doc, SubCols, DDec>(
       this.cImpl.doc(documentPath)
     );
   }
 
-  add(data: DDec): Promise<DocumentReference<Doc, SubCol, DDec>> {
+  add(data: DDec): Promise<DocumentReference<Doc, SubCols, DDec>> {
     return this.cImpl.add(data).then((dImplRet) => {
       return new DocumentReference(dImplRet);
     });
@@ -41,8 +41,8 @@ export class CollectionReference<
 
   withDecoder<V extends object>(
     fromFirestore: Decoder<Doc, V>
-  ): CollectionReferenceWithDecoder<Doc, SubCol, V> {
-    return new CollectionReferenceWithDecoder<Doc, SubCol, V>(
+  ): CollectionReferenceWithDecoder<Doc, SubCols, V> {
+    return new CollectionReferenceWithDecoder<Doc, SubCols, V>(
       this.cImpl,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       fromFirestore as any

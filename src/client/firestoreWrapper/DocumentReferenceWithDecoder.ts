@@ -6,7 +6,7 @@ import type { Document, SubCollections, Encoder } from './type';
 
 export class DocumentReferenceWithDecoder<
   Doc extends Document,
-  SubCol extends SubCollections,
+  SubCols extends SubCollections,
   DDec = Doc
 > {
   constructor(
@@ -16,8 +16,8 @@ export class DocumentReferenceWithDecoder<
 
   withEncoder(
     toFirestore: Encoder<Doc, DDec>
-  ): DocumentReference<Doc, SubCol, DDec> {
-    return new DocumentReference<Doc, SubCol, DDec>(
+  ): DocumentReference<Doc, SubCols, DDec> {
+    return new DocumentReference<Doc, SubCols, DDec>(
       this.dImpl.withConverter({
         fromFirestore: fromFirestoreStab(this.fromFirestore),
         toFirestore: toFirestore,
