@@ -33,6 +33,8 @@ export const ArrayRemove = <T>(...elements: T[]): ArrayRemove<T> =>
 export const ArrayUnion = <T>(...elements: T[]): ArrayUnion<T> =>
   firebase.firestore.FieldValue.arrayUnion(...elements) as ArrayUnion<T>;
 
+//オブジェクト内は、fieldvalueを使えないらしいので、
+//1階層のみFieldValueを入力可能にする
 export type AddFieldValue<T extends object> = {
   [K in keyof T]: T[K] extends number | undefined
     ? T[K] | Increment
@@ -40,8 +42,6 @@ export type AddFieldValue<T extends object> = {
     ? T[K] | ServerTimestamp
     : T[K] extends (infer A)[] | undefined
     ? T[K] | ArrayRemove<A> | ArrayUnion<A>
-    : T[K] extends object
-    ? AddFieldValue<T[K]>
     : T[K];
 };
 
