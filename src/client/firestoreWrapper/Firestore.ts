@@ -1,7 +1,11 @@
 import * as firebase from 'firebase';
 
 import { CollectionReference } from './CollectionReference';
-import type { DatabaseType } from './types';
+import type {
+  DatabaseType,
+  CollectionNames,
+  CollectionNamesDocument,
+} from './types';
 import { Query } from './Query';
 
 class Firestore<D extends DatabaseType = DatabaseType> {
@@ -62,10 +66,10 @@ class Firestore<D extends DatabaseType = DatabaseType> {
   }
 
   //型は暫定
-  collectionGroup<K extends keyof D>(
+  collectionGroup<K extends CollectionNames<D>>(
     collectionId: string & K
-  ): Query<D[K]['_documents']> {
-    return new Query<D[K]['_documents']>(
+  ): Query<CollectionNamesDocument<D, K>> {
+    return new Query<CollectionNamesDocument<D, K>>(
       this.impl.collectionGroup(collectionId)
     );
   }

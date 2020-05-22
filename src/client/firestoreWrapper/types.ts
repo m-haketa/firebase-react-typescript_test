@@ -260,3 +260,60 @@ type C = SubstituteObjArr<OrderA1, { value: boolean }>;
 
 const c: C = [{ value: false }, { name: 'a' }];
 */
+
+//全プロパティを一覧にする。
+//ただし'_documents'配下は一覧に含めない
+//直下のPropertyごとに、 Property | Property配下のProperty を取得
+//循環定義のエラーを防ぐために、いったん[P in keyof T]に入れ、最後に[keyof T]で取り出す
+type FlattenedKeysWithoutDocuments<T> = {
+  [P in keyof T]: P extends '_documents'
+    ? never // '_documents'配下は無視
+    : P | (T[P] extends object ? FlattenedKeysWithoutDocuments<T[P]> : never);
+}[keyof T];
+
+//先ほどの型のうち「'_collections'」は不要のため取り除く
+//これがCollectionの一覧になる。
+//ただし、それだけだと実際に使うときに
+//「Type instantiation is excessively deep and possibly infinite」エラー
+//が出るため「extends infer A ? A : never」でエラーを抑制する
+export type CollectionNames<T> = Exclude<
+  FlattenedKeysWithoutDocuments<T>,
+  '_collections'
+> extends infer A
+  ? A
+  : never;
+
+//オブジェクトTの中で、プロパティがKのものの配下オブジェクトを取得する
+//実際に使うときには、Tにデータベース型
+//Kに、CollectionNames<データベース型>で取得したプロパティ名が入る
+export type NestedVal<T, K> =
+  // 指定したKがTのプロパティならばその値（T[K]）を取り出す
+  | (K extends keyof T ? T[K] : never)
+  // T[P]がオブジェクトなら、さらに配下のオブジェクトを探索する
+  // 循環定義のエラーにならないように、いったん[P in keyof T]に入れ、最後に[keyof T]で取り出す
+  | {
+      [P in keyof T]: T[P] extends object ? NestedVal<T[P], K> : never;
+    }[keyof T];
+
+//型がうまくつかない場合に、型を無理やりキャストする
+type Cast<T, P> = T extends P ? T : P;
+
+//データベースDから、指定したコレクション名Kに該当するCollectionを取り出す
+//NestedValの結果を使おうとすると、
+//「Type instantiation is excessively deep and possibly infinite」エラー
+//が出るため、extends infer A ? A : never を使うとともに、
+//結果がCollection型にならないため、下記でキャストも行う
+//extends infer A ? Cast<A, Collection> : never
+type CollectionNamesCollection<D, K extends CollectionNames<D>> = NestedVal<
+  D,
+  K
+> extends infer A
+  ? Cast<A, Collection>
+  : never;
+
+//データベースDから、指定したコレクション名Kに該当するCollectionの
+//「'_documents'」部分を取り出す
+export type CollectionNamesDocument<
+  D,
+  K extends CollectionNames<D>
+> = CollectionNamesCollection<D, K>['_documents'];
