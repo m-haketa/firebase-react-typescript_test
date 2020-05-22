@@ -2,6 +2,7 @@ import * as firebase from 'firebase';
 
 import { CollectionReference } from './CollectionReference';
 import type { DatabaseType } from './types';
+import { Query } from './Query';
 
 class Firestore<D extends DatabaseType = DatabaseType> {
   constructor(private impl: firebase.firestore.Firestore) {}
@@ -60,9 +61,17 @@ class Firestore<D extends DatabaseType = DatabaseType> {
     return this.impl.onSnapshotsInSync(params);
   }
 
+  //型は暫定
+  collectionGroup<K extends keyof D>(
+    collectionId: string & K
+  ): Query<D[K]['_documents']> {
+    return new Query<D[K]['_documents']>(
+      this.impl.collectionGroup(collectionId)
+    );
+  }
+
   /*
   doc(documentPath: string): DocumentReference<DocumentData>;
-  collectionGroup(collectionId: string): Query<DocumentData>;
   runTransaction<T>(
     updateFunction: (transaction: Transaction) => Promise<T>
   ): Promise<T>;
